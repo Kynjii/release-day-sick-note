@@ -25,6 +25,11 @@ body { margin: 0; }
   --sky-top: #FF7A59;
   --sky-bottom: #FFC56E;
   --on-hot: #FFFFFF;
+  --hero-fg: #2A1636;
+  --hero-inverse: #FFFFFF;
+  --hero-chip: rgba(255, 255, 255, 0.4);
+  --hero-chip-line: rgba(42, 22, 54, 0.28);
+  --hero-shadow: rgba(255, 255, 255, 0.45);
   --font-display: "Bungee", "Impact", "Arial Black", sans-serif;
   --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
@@ -34,6 +39,8 @@ body { margin: 0; }
     --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
     --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
     --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+    --hero-fg: #FFFFFF; --hero-inverse: #2A1636; --hero-chip: rgba(26, 16, 48, 0.28);
+    --hero-chip-line: rgba(255, 255, 255, 0.35); --hero-shadow: rgba(42, 22, 54, 0.35);
     color-scheme: dark;
   }
 }
@@ -41,6 +48,8 @@ body { margin: 0; }
   --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
   --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
   --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+  --hero-fg: #FFFFFF; --hero-inverse: #2A1636; --hero-chip: rgba(26, 16, 48, 0.28);
+  --hero-chip-line: rgba(255, 255, 255, 0.35); --hero-shadow: rgba(42, 22, 54, 0.35);
   color-scheme: dark;
 }
 
@@ -61,7 +70,7 @@ body {
 
 .hero {
   background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
-  color: #FFFFFF;
+  color: var(--hero-fg);
   overflow: hidden;
   position: relative;
 }
@@ -87,14 +96,15 @@ body {
   text-transform: uppercase;
   opacity: 0.9;
   margin: 0;
+  text-wrap: balance;
 }
 .lang {
   display: inline-flex;
   padding: 3px;
   gap: 2px;
   border-radius: 999px;
-  background: rgba(26, 16, 48, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: var(--hero-chip);
+  border: 1px solid var(--hero-chip-line);
 }
 .lang button {
   font: inherit;
@@ -102,7 +112,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: #FFFFFF;
+  color: var(--hero-fg);
   background: transparent;
   border: 0;
   border-radius: 999px;
@@ -111,8 +121,8 @@ body {
   padding: 0 14px;
   cursor: pointer;
 }
-.lang button[aria-pressed="true"] { background: #FFFFFF; color: #2A1636; }
-.lang button:focus-visible { outline: 3px solid #FFFFFF; outline-offset: 2px; }
+.lang button[aria-pressed="true"] { background: var(--hero-fg); color: var(--hero-inverse); }
+.lang button:focus-visible { outline: 3px solid var(--hero-fg); outline-offset: 2px; }
 h1 {
   font-family: var(--font-display);
   font-weight: 400;
@@ -122,7 +132,7 @@ h1 {
   text-wrap: balance;
   overflow-wrap: break-word;
   hyphens: auto;
-  text-shadow: 3px 3px 0 rgba(42, 22, 54, 0.35);
+  text-shadow: 3px 3px 0 var(--hero-shadow);
 }
 .lede {
   max-width: 52ch;
@@ -136,8 +146,8 @@ h1 {
   margin-bottom: 32px;
 }
 .tick {
-  background: rgba(26, 16, 48, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: var(--hero-chip);
+  border: 1px solid var(--hero-chip-line);
   border-radius: 10px;
   padding: 8px 14px;
   min-width: 76px;
