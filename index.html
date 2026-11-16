@@ -18,7 +18,7 @@ body { margin: 0; }
   --surface: #FFF8F4;
   --ink: #2A1636;
   --muted: #7A5A72;
-  --hot: #D92A63;
+  --hot: #C8245A;
   --sea: #0B8793;
   --sun: #FF9F1C;
   --line: #F0C6B8;
@@ -59,15 +59,22 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
-/* ---------- Hero ---------- */
 .hero {
   background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
   color: #FFFFFF;
   overflow: hidden;
   position: relative;
 }
-.hero .wrap {
-  padding-block: 40px 0;
+.topbar {
+  padding-block: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hero-grid {
+  padding-block: 20px 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
@@ -79,15 +86,42 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.9;
-  margin: 0 0 8px;
+  margin: 0;
 }
+.lang {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  background: rgba(26, 16, 48, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.lang button {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #FFFFFF;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  min-width: 48px;
+  min-height: 44px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: #FFFFFF; color: #2A1636; }
+.lang button:focus-visible { outline: 3px solid #FFFFFF; outline-offset: 2px; }
 h1 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(36px, 7vw, 72px);
+  font-size: clamp(34px, 7vw, 72px);
   line-height: 0.95;
   margin: 0 0 16px;
   text-wrap: balance;
+  overflow-wrap: break-word;
+  hyphens: auto;
   text-shadow: 3px 3px 0 rgba(42, 22, 54, 0.35);
 }
 .lede {
@@ -131,15 +165,12 @@ h1 {
 }
 .sun {
   width: clamp(140px, 22vw, 240px);
-  aspect-ratio: 1;
   max-width: 100%;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
   aspect-ratio: 2 / 1;
   background:
     repeating-linear-gradient(180deg, transparent 0 14px, var(--sky-bottom) 14px 20px),
     linear-gradient(180deg, #FFE36E, var(--sun));
-  background-position: 0 0, 0 0;
-  -webkit-mask: linear-gradient(#000 0 0);
   align-self: end;
 }
 .horizon {
@@ -148,7 +179,6 @@ h1 {
   border-radius: 14px 14px 0 0;
 }
 
-/* ---------- Main ---------- */
 main .wrap {
   padding-block: 32px 64px;
   display: grid;
@@ -181,27 +211,60 @@ input[type="text"] {
 }
 input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset: 1px; border-color: var(--sea); }
 
-/* Symptom chart */
+/* Symptom chart: [checkbox] [code over name] [points pill], same three columns at every width */
 .chart { display: grid; gap: 8px; }
 .sym { position: relative; display: block; cursor: pointer; }
 .sym input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .sym .row {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  gap: 12px;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
-  padding: 10px 14px;
+  padding: 12px 14px;
   border: 1.5px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--surface);
-  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
-.sym .code { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-.sym .name { font-weight: 500; }
-.sym .cost { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sym .box {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.sym .box::after {
+  content: "";
+  width: 6px;
+  height: 11px;
+  border: solid var(--on-hot);
+  border-width: 0 2.5px 2.5px 0;
+  transform: translateY(-1px) rotate(45deg);
+  opacity: 0;
+}
+.sym .text { display: grid; gap: 1px; min-width: 0; }
+.sym .code { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); }
+.sym .name { font-weight: 500; line-height: 1.3; overflow-wrap: break-word; }
+.sym .cost {
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--line) 55%, transparent);
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 .sym:hover .row { border-color: var(--hot); }
-.sym input:checked + .row { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 12%, var(--surface)); }
-.sym input:checked + .row .code { color: var(--hot); font-weight: 600; }
+.sym input:checked + .row { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 10%, var(--surface)); }
+.sym input:checked + .row .box { background: var(--hot); border-color: var(--hot); }
+.sym input:checked + .row .box::after { opacity: 1; }
+.sym input:checked + .row .code { color: var(--hot); }
+.sym input:checked + .row .cost { color: var(--hot); background: color-mix(in srgb, var(--hot) 16%, transparent); }
 .sym input:focus-visible + .row { outline: 3px solid var(--sea); outline-offset: 2px; }
 
 /* Segmented choices */
@@ -209,8 +272,10 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .seg label { position: relative; cursor: pointer; }
 .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .seg span {
-  display: inline-block;
-  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
   border: 1.5px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
@@ -221,7 +286,7 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .seg input:focus-visible + span { outline: 3px solid var(--sea); outline-offset: 2px; }
 
 .toggle { display: flex; gap: 10px; align-items: center; font-size: 15px; cursor: pointer; }
-.toggle input { width: 18px; height: 18px; accent-color: var(--hot); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--hot); flex: none; }
 
 /* Output */
 .out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; }
@@ -262,7 +327,7 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
   font-family: var(--font-body);
 }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-button {
+.actions button {
   font: inherit;
   font-weight: 700;
   font-size: 15px;
@@ -272,11 +337,43 @@ button {
   cursor: pointer;
   transition: transform 0.12s;
 }
-button:active { transform: translateY(1px); }
-button:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
-.btn-primary { background: var(--hot); border-color: var(--hot); color: var(--on-hot); }
+.actions button:active { transform: translateY(1px); }
+.actions button:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.actions .btn-primary { background: var(--hot); border-color: var(--hot); color: var(--on-hot); }
 .btn-ghost { background: transparent; color: var(--ink); }
 .toast { font-family: var(--font-mono); font-size: 13px; color: var(--sea); align-self: center; min-height: 1em; }
+
+/* Evidence: t-online articles */
+.reading .wrap { padding-block: 0 48px; }
+.reading .hint { max-width: 65ch; }
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.news-item {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 8px;
+  height: 100%;
+  padding: 16px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.news-item:hover { border-color: var(--hot); transform: translateY(-2px); }
+.news-item:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.news-item .tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hot); }
+.news-item .headline { font-weight: 700; line-height: 1.35; overflow-wrap: break-word; }
+.news-item .note { color: var(--muted); font-size: 14px; }
+.news-item .src { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.news-item .src::after { content: " ↗"; }
 
 footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 
@@ -285,10 +382,9 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
   .out { position: static; }
 }
 @media (max-width: 560px) {
-  .hero .wrap { grid-template-columns: minmax(0, 1fr); }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
   .sun { width: 160px; justify-self: center; }
-  .sym .row { grid-template-columns: 52px minmax(0, 1fr); }
-  .sym .cost { grid-column: 2; }
+  .sym .row { gap: 12px; padding: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -298,18 +394,21 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 <body>
 
 <header class="hero">
-  <div class="wrap">
+  <div class="wrap topbar">
+    <p class="eyebrow" data-i18n="eyebrow"></p>
+    <div class="lang" role="group" id="lang" data-i18n-aria="langLabel"></div>
+  </div>
+  <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">Department of Couch Medicine · Form SD-6</p>
-      <h1>Release Day Sick Note</h1>
-      <p class="lede">Your symptoms are real. The timing is a coincidence. Pick a diagnosis, choose how hard to try, and copy an email that HR will absolutely believe.</p>
-      <div class="countdown" id="countdown" aria-live="polite">
-        <div class="tick"><b id="cd-d">0</b><span>days</span></div>
-        <div class="tick"><b id="cd-h">0</b><span>hours</span></div>
-        <div class="tick"><b id="cd-m">0</b><span>min</span></div>
-        <div class="tick"><b id="cd-s">0</b><span>sec</span></div>
+      <h1 data-i18n="title"></h1>
+      <p class="lede" data-i18n="lede"></p>
+      <div class="countdown">
+        <div class="tick"><b id="cd-d">0</b><span data-i18n="days"></span></div>
+        <div class="tick"><b id="cd-h">0</b><span data-i18n="hours"></span></div>
+        <div class="tick"><b id="cd-m">0</b><span data-i18n="minutes"></span></div>
+        <div class="tick"><b id="cd-s">0</b><span data-i18n="seconds"></span></div>
       </div>
-      <p class="countdown-note" id="cd-note">Until GTA 6 on 19 Nov 2026, the last announced date. Delays are a known side effect.</p>
+      <p class="countdown-note" id="cd-note"></p>
     </div>
     <div class="sun" aria-hidden="true"></div>
   </div>
@@ -319,44 +418,34 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 <main>
   <div class="wrap">
     <section aria-labelledby="h-form">
-      <h2 id="h-form" class="visually-plain">1. Patient details</h2>
-      <p class="hint">Who is sick, who needs to know, and who gets stuck with your work.</p>
+      <h2 id="h-form" data-i18n="h1"></h2>
+      <p class="hint" data-i18n="hint1"></p>
       <div class="block">
-        <div class="fields">
-          <label class="field" for="f-name">Your name
-            <input type="text" id="f-name" value="Alex" autocomplete="off">
-          </label>
-          <label class="field" for="f-boss">Manager
-            <input type="text" id="f-boss" value="Jordan" autocomplete="off">
-          </label>
-          <label class="field" for="f-cover">Coworker to volunteer
-            <input type="text" id="f-cover" value="Sam from Accounting" autocomplete="off">
-          </label>
-        </div>
+        <div class="fields" id="fields"></div>
       </div>
 
-      <h2>2. Symptoms</h2>
-      <p class="hint">Each one costs believability. The number on the right is how much.</p>
+      <h2 data-i18n="h2"></h2>
+      <p class="hint" data-i18n="hint2"></p>
       <div class="block chart" id="chart"></div>
 
-      <h2>3. Tone</h2>
-      <p class="hint">How much effort you can spare before the servers go live.</p>
-      <div class="block seg" id="tone" role="radiogroup" aria-label="Tone"></div>
+      <h2 data-i18n="h3"></h2>
+      <p class="hint" data-i18n="hint3"></p>
+      <div class="block seg" id="tone" role="radiogroup" data-i18n-aria="h3"></div>
 
-      <h2>4. Expected return</h2>
-      <p class="hint">Be realistic. Your manager can count.</p>
-      <div class="block seg" id="ret" role="radiogroup" aria-label="Expected return"></div>
+      <h2 data-i18n="h4"></h2>
+      <p class="hint" data-i18n="hint4"></p>
+      <div class="block seg" id="ret" role="radiogroup" data-i18n-aria="h4"></div>
 
       <div class="block">
-        <label class="toggle" for="f-ps"><input type="checkbox" id="f-ps"> Add a suspicious P.S. for your coworkers</label>
+        <label class="toggle" for="f-ps"><input type="checkbox" id="f-ps"> <span data-i18n="psToggle"></span></label>
       </div>
     </section>
 
     <section class="out" aria-labelledby="h-out">
-      <h2 id="h-out" hidden>Your email</h2>
+      <h2 id="h-out" data-i18n="outHeading" hidden></h2>
       <div class="meter">
         <div class="meter-top">
-          <span class="meter-label">Believability</span>
+          <span class="meter-label" data-i18n="believability"></span>
           <span class="meter-num" id="score">0%</span>
         </div>
         <div class="bar"><i id="bar"></i></div>
@@ -365,136 +454,362 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 
       <article class="email">
         <div class="email-head">
-          <span class="k">Subject</span>
+          <span class="k" data-i18n="subject"></span>
           <span class="subj" id="subject"></span>
         </div>
         <pre class="email-body" id="body"></pre>
       </article>
 
       <div class="actions">
-        <button class="btn-primary" id="copy" type="button">Copy email</button>
-        <button class="btn-ghost" id="shuffle" type="button">Random diagnosis</button>
+        <button class="btn-primary" id="copy" type="button" data-i18n="copy"></button>
+        <button class="btn-ghost" id="shuffle" type="button" data-i18n="shuffle"></button>
         <span class="toast" id="toast" role="status"></span>
       </div>
     </section>
   </div>
 </main>
 
+<section class="reading" aria-labelledby="h-reading">
+  <div class="wrap">
+    <h2 id="h-reading" data-i18n="readingHeading"></h2>
+    <p class="hint" data-i18n="readingHint"></p>
+    <ul class="news-list" id="news-list"></ul>
+  </div>
+</section>
+
 <footer>
-  <div class="wrap">A joke page. Not medical advice, not HR advice, and not affiliated with any game studio. Please don't actually send this to your manager. Or do, and tell us how it went.</div>
+  <div class="wrap" data-i18n="footer"></div>
 </footer>
 
 <script>
+// Each entry keeps its language-independent data (id, code, cost) once, with text per language.
+
+const LANGS = {
+  en: { label: "EN", locale: "en-GB", and: "and" },
+  de: { label: "DE", locale: "de-DE", and: "und" },
+};
+
+const UI = {
+  en: {
+    docTitle: "Release Day Sick Note",
+    langLabel: "Language",
+    eyebrow: "Department of Couch Medicine · Form SD-6",
+    title: "Release Day Sick Note",
+    lede: "Your symptoms are real. The timing is a coincidence. Pick a diagnosis, choose how hard to try, and copy an email that HR will absolutely believe.",
+    days: "days", hours: "hours", minutes: "min", seconds: "sec",
+    countdown: d => `Until GTA 6 on ${d}, the last announced date. Delays are a known side effect.`,
+    released: "It's out. Why are you still reading this? Send the email.",
+    h1: "1. Patient details",
+    hint1: "Who is sick, who needs to know, and who gets stuck with your work.",
+    h2: "2. Symptoms",
+    hint2: "Each one costs believability. The number on the right is how much.",
+    h3: "3. Tone",
+    hint3: "How much effort you can spare before the servers go live.",
+    h4: "4. Expected return",
+    hint4: "Be realistic. Your manager can count.",
+    psToggle: "Add a suspicious P.S. for your coworkers",
+    outHeading: "Your email",
+    believability: "Believability",
+    subject: "Subject",
+    copy: "Copy email",
+    shuffle: "Random diagnosis",
+    copied: "Copied. Get well soon.",
+    selected: "Selected. Press Ctrl+C to copy.",
+    shuffled: "New diagnosis issued.",
+    readingHeading: "The latest on GTA 6",
+    readingHint: "Recent news from t-online, newest first. The articles are in German.",
+    source: "t-online.de · in German",
+    footer: "A joke page. Not medical advice, not HR advice, and not affiliated with any game studio. Please don't actually send this to your manager. Or do, and tell us how it went.",
+    fallbackName: "Your Name",
+    fallbackBoss: "there",
+    cover: c => `If anything urgent comes up, ${c} has kindly agreed to cover for me. They don't know yet.`,
+    ps: "P.S. To anyone else feeling a mysterious illness coming on: don't fight it. Rest is important.",
+  },
+  de: {
+    docTitle: "Release-Tag-Krankmeldung",
+    langLabel: "Sprache",
+    eyebrow: "Abteilung für Couch-Medizin · Formular SD-6",
+    title: "Release-Tag-Krankmeldung",
+    lede: "Deine Symptome sind echt. Der Zeitpunkt ist reiner Zufall. Wähl eine Diagnose, entscheide, wie viel Mühe du dir gibst, und kopier eine E-Mail, die die Personalabteilung garantiert glaubt.",
+    days: "Tage", hours: "Std.", minutes: "Min.", seconds: "Sek.",
+    countdown: d => `Bis GTA 6 am ${d}, dem zuletzt angekündigten Termin. Verschiebungen sind eine bekannte Nebenwirkung.`,
+    released: "Es ist draußen. Warum liest du das noch? Schick die E-Mail ab.",
+    h1: "1. Patientendaten",
+    hint1: "Wer krank ist, wer Bescheid wissen muss und wer deine Arbeit abbekommt.",
+    h2: "2. Symptome",
+    hint2: "Jedes Symptom kostet Glaubwürdigkeit. Die Zahl rechts zeigt, wie viel.",
+    h3: "3. Tonfall",
+    hint3: "Wie viel Mühe du dir leisten kannst, bevor die Server online gehen.",
+    h4: "4. Voraussichtliche Rückkehr",
+    hint4: "Bleib realistisch. Deine Führungskraft kann zählen.",
+    psToggle: "Verdächtiges PS für die Kollegschaft anhängen",
+    outHeading: "Deine E-Mail",
+    believability: "Glaubwürdigkeit",
+    subject: "Betreff",
+    copy: "E-Mail kopieren",
+    shuffle: "Zufällige Diagnose",
+    copied: "Kopiert. Gute Besserung.",
+    selected: "Markiert. Mit Strg+C kopieren.",
+    shuffled: "Neue Diagnose ausgestellt.",
+    readingHeading: "Das Neueste zu GTA 6",
+    readingHint: "Aktuelle Meldungen von t-online, die neuesten zuerst.",
+    source: "t-online.de",
+    footer: "Eine Scherzseite. Keine medizinische Beratung, keine Personalberatung und mit keinem Spielestudio verbunden. Bitte schick das nicht wirklich an deine Führungskraft. Oder doch, und erzähl uns, wie es gelaufen ist.",
+    fallbackName: "Dein Name",
+    fallbackBoss: "zusammen",
+    cover: c => `Falls etwas Dringendes anfällt, vertritt mich freundlicherweise ${c}. Bescheid gesagt habe ich allerdings noch nicht.`,
+    ps: "PS: An alle, bei denen sich auch eine rätselhafte Krankheit anbahnt: Nicht dagegen ankämpfen. Ruhe ist wichtig.",
+  },
+};
+
+const FIELDS = [
+  { id: "name",  text: { en: { label: "Your name",             example: "Alex" },
+                         de: { label: "Dein Name",             example: "Alex" } } },
+  { id: "boss",  text: { en: { label: "Manager",               example: "Jordan" },
+                         de: { label: "Führungskraft",         example: "Jordan" } } },
+  { id: "cover", text: { en: { label: "Coworker to volunteer", example: "Sam from Accounting" },
+                         de: { label: "Freiwillige Vertretung", example: "Sam aus der Buchhaltung" } } },
+];
+
 const SYMPTOMS = [
-  { id: "fever",   code: "VC-01", label: "Vice City Fever",         cost: 8,  line: "a high temperature and a strong urge to be somewhere with palm trees" },
-  { id: "thumb",   code: "TH-02", label: "Thumb stiffness",         cost: 10, line: "stiff thumbs that my doctor says need a full day of repetitive motion therapy" },
-  { id: "light",   code: "PH-03", label: "Sensitivity to daylight", cost: 6,  line: "sensitivity to daylight, so I'll be resting with the curtains closed" },
-  { id: "hearing", code: "AU-04", label: "Selective hearing loss",  cost: 12, line: "a hearing problem that blocks out phone calls and Slack notifications" },
-  { id: "tired",   code: "SL-05", label: "Mysterious exhaustion",   cost: 15, line: "exhaustion from being up very late last night for reasons unrelated to any midnight launch" },
-  { id: "wanted",  code: "WL-06", label: "Five-star anxiety",       cost: 9,  line: "a racing heart and a constant feeling that I'm being chased" },
-  { id: "loading", code: "LD-07", label: "Brain buffering",         cost: 7,  line: "a foggy head that feels stuck on a loading screen" },
-  { id: "spread",  code: "CX-08", label: "Highly contagious",       cost: 14, line: "something highly contagious that mostly affects people aged 18 to 45" },
+  { id: "fever",   code: "VC-01", cost: 8,  text: {
+      en: { label: "Vice City Fever",         line: "a high temperature and a strong urge to be somewhere with palm trees" },
+      de: { label: "Vice-City-Fieber",        line: "erhöhte Temperatur und ein starkes Verlangen nach Palmen" } } },
+  { id: "thumb",   code: "TH-02", cost: 10, text: {
+      en: { label: "Thumb stiffness",         line: "stiff thumbs that my doctor says need a full day of repetitive motion therapy" },
+      de: { label: "Daumensteifheit",         line: "steife Daumen, die laut ärztlichem Rat einen ganzen Tag Bewegungstherapie brauchen" } } },
+  { id: "light",   code: "PH-03", cost: 6,  text: {
+      en: { label: "Sensitivity to daylight", line: "sensitivity to daylight, so I'll be resting with the curtains closed" },
+      de: { label: "Lichtempfindlichkeit",    line: "eine starke Lichtempfindlichkeit, weshalb ich mich bei geschlossenen Vorhängen ausruhe" } } },
+  { id: "hearing", code: "AU-04", cost: 12, text: {
+      en: { label: "Selective hearing loss",  line: "a hearing problem that blocks out phone calls and Slack notifications" },
+      de: { label: "Selektiver Hörverlust",   line: "ein Hörproblem, das Anrufe und Slack-Benachrichtigungen ausblendet" } } },
+  { id: "tired",   code: "SL-05", cost: 15, text: {
+      en: { label: "Mysterious exhaustion",   line: "exhaustion from being up very late last night for reasons unrelated to any midnight launch" },
+      de: { label: "Rätselhafte Erschöpfung", line: "Erschöpfung, weil ich letzte Nacht sehr lange wach war, aus Gründen, die nichts mit einem Mitternachts-Release zu tun haben" } } },
+  { id: "wanted",  code: "WL-06", cost: 9,  text: {
+      en: { label: "Five-star anxiety",       line: "a racing heart and a constant feeling that I'm being chased" },
+      de: { label: "Fünf-Sterne-Angst",       line: "Herzrasen und das ständige Gefühl, verfolgt zu werden" } } },
+  { id: "loading", code: "LD-07", cost: 7,  text: {
+      en: { label: "Brain buffering",         line: "a foggy head that feels stuck on a loading screen" },
+      de: { label: "Hirn-Buffering",          line: "einen vernebelten Kopf, der auf einem Ladebildschirm festhängt" } } },
+  { id: "spread",  code: "CX-08", cost: 14, text: {
+      en: { label: "Highly contagious",       line: "something highly contagious that mostly affects people aged 18 to 45" },
+      de: { label: "Hochansteckend",          line: "etwas Hochansteckendes, das vor allem Menschen zwischen 18 und 45 trifft" } } },
 ];
 
 const TONES = [
-  { id: "pro",    label: "Professional",           cost: 0,
-    subject: n => `Sick day: ${n}`,
-    open: b => `Hi ${b},\n\nI woke up unwell this morning and won't be able to work today.`,
-    syms: l => `I'm dealing with ${l}.`,
-    none: "I'd rather not go into detail.",
-    sign: "Best regards," },
-  { id: "drama",  label: "Dramatic",               cost: 10,
-    subject: () => `I may not survive the day`,
-    open: b => `Dear ${b},\n\nI write to you from what may be my deathbed.`,
-    syms: l => `My symptoms include ${l}. Doctors are baffled. One of them wept.`,
-    none: "My symptoms are too terrible to describe.",
-    sign: "With what strength I have left," },
-  { id: "detail", label: "Suspiciously detailed",  cost: 18,
-    subject: () => `Absence notice (please read all 4 sections)`,
-    open: b => `Hi ${b},\n\nAt exactly 6:00 AM this morning, which is a completely normal time to be awake on a Thursday, I came down with something.`,
-    syms: l => `Specifically, I have ${l}. I have documented all of this in a spreadsheet, available on request.`,
-    none: "I have documented the symptoms in a spreadsheet, available on request.",
-    sign: "Thanks in advance for not asking follow-up questions," },
-  { id: "lazy",   label: "Barely trying",          cost: 25,
-    subject: () => `sick`,
-    open: b => `hey ${b.toLowerCase()}\n\nsick. not coming in.`,
-    syms: l => `symptoms: ${l.toLowerCase()}.`,
-    none: "",
-    sign: "ttyl," },
+  { id: "pro", cost: 0, text: {
+      en: { label: "Professional",
+            subject: n => `Sick day: ${n}`,
+            open: b => `Hi ${b},\n\nI woke up unwell this morning and won't be able to work today.`,
+            syms: l => `I'm dealing with ${l}.`,
+            none: "I'd rather not go into detail.",
+            sign: "Best regards," },
+      de: { label: "Professionell",
+            subject: n => `Krankmeldung: ${n}`,
+            open: b => `Hallo ${b},\n\nich bin heute Morgen krank aufgewacht und kann heute leider nicht arbeiten.`,
+            syms: l => `Ich habe ${l}.`,
+            none: "Die Details erspare ich uns lieber.",
+            sign: "Viele Grüße" } } },
+  { id: "drama", cost: 10, text: {
+      en: { label: "Dramatic",
+            subject: () => `I may not survive the day`,
+            open: b => `Dear ${b},\n\nI write to you from what may be my deathbed.`,
+            syms: l => `My symptoms include ${l}. Doctors are baffled. One of them wept.`,
+            none: "My symptoms are too terrible to describe.",
+            sign: "With what strength I have left," },
+      de: { label: "Dramatisch",
+            subject: () => `Ich überlebe den Tag vielleicht nicht`,
+            open: b => `Hallo ${b},\n\nich melde mich von meinem womöglichen Sterbebett.`,
+            syms: l => `Ich habe ${l}. Die Ärzte sind ratlos. Einer hat geweint.`,
+            none: "Meine Symptome sind zu schrecklich, um sie zu beschreiben.",
+            sign: "Mit letzter Kraft" } } },
+  { id: "detail", cost: 18, text: {
+      en: { label: "Suspiciously detailed",
+            subject: () => `Absence notice (please read all 4 sections)`,
+            open: b => `Hi ${b},\n\nAt exactly 6:00 AM this morning, which is a completely normal time to be awake on a Thursday, I came down with something.`,
+            syms: l => `Specifically, I have ${l}. I have documented all of this in a spreadsheet, available on request.`,
+            none: "I have documented the symptoms in a spreadsheet, available on request.",
+            sign: "Thanks in advance for not asking follow-up questions," },
+      de: { label: "Verdächtig detailliert",
+            subject: () => `Abwesenheitsmeldung (bitte alle 4 Abschnitte lesen)`,
+            open: b => `Hallo ${b},\n\nheute Morgen um exakt 6:00 Uhr, eine völlig normale Uhrzeit, um an einem Donnerstag wach zu sein, hat es mich erwischt.`,
+            syms: l => `Konkret habe ich ${l}. Ich habe alles in einer Tabelle dokumentiert, die ich auf Anfrage gern zur Verfügung stelle.`,
+            none: "Die Symptome habe ich in einer Tabelle dokumentiert, die ich auf Anfrage gern zur Verfügung stelle.",
+            sign: "Danke im Voraus für keine Rückfragen" } } },
+  { id: "lazy", cost: 25, text: {
+      en: { label: "Barely trying",
+            subject: () => `sick`,
+            open: b => `hey ${b.toLowerCase()}\n\nsick. not coming in.`,
+            syms: l => `symptoms: ${l.toLowerCase()}.`,
+            none: "",
+            sign: "ttyl," },
+      de: { label: "Minimaler Aufwand",
+            subject: () => `krank`,
+            open: b => `hey ${b.toLowerCase()}\n\nkrank. komm nicht.`,
+            syms: l => `symptome: ${l.toLowerCase()}.`,
+            none: "",
+            sign: "bis dann" } } },
 ];
 
 const RETURNS = [
-  { id: "tomorrow", label: "Tomorrow",           cost: 0,  line: "I expect to be back tomorrow." },
-  { id: "monday",   label: "Next week",          cost: 8,  line: "I should be well enough to return early next week." },
-  { id: "story",    label: "After the main story", cost: 30, line: "I expect to be back once I finish the main story. Recovery time varies." },
-  { id: "hundred",  label: "At 100% completion", cost: 45, line: "I'll be back when I reach 100% completion. Please don't give away my desk." },
+  { id: "tomorrow", cost: 0, text: {
+      en: { label: "Tomorrow",              line: "I expect to be back tomorrow." },
+      de: { label: "Morgen",                line: "Ich bin voraussichtlich morgen wieder da." } } },
+  { id: "monday", cost: 8, text: {
+      en: { label: "Next week",             line: "I should be well enough to return early next week." },
+      de: { label: "Nächste Woche",         line: "Anfang nächster Woche sollte ich wieder fit sein." } } },
+  { id: "story", cost: 30, text: {
+      en: { label: "After the main story",  line: "I expect to be back once I finish the main story. Recovery time varies." },
+      de: { label: "Nach der Hauptstory",   line: "Ich bin zurück, sobald ich die Hauptstory durchgespielt habe. Die Genesungsdauer kann variieren." } } },
+  { id: "hundred", cost: 45, text: {
+      en: { label: "At 100% completion",    line: "I'll be back when I reach 100% completion. Please don't give away my desk." },
+      de: { label: "Bei 100 % Abschluss",   line: "Ich bin zurück, wenn ich 100 % erreicht habe. Bitte vergebt meinen Schreibtisch nicht." } } },
 ];
 
 const VERDICTS = [
-  { min: 80, text: "HR will never know." },
-  { min: 60, text: "Your manager raises one eyebrow." },
-  { min: 40, text: "Your manager checks your online status." },
-  { min: 20, text: "Your manager has also called in sick." },
-  { min: 0,  text: "Just send a screenshot of the title screen." },
+  { min: 80, text: { en: "HR will never know.",                        de: "Die Personalabteilung wird es nie erfahren." } },
+  { min: 60, text: { en: "Your manager raises one eyebrow.",           de: "Deine Führungskraft hebt eine Augenbraue." } },
+  { min: 40, text: { en: "Your manager checks your online status.",    de: "Deine Führungskraft prüft deinen Online-Status." } },
+  { min: 20, text: { en: "Your manager has also called in sick.",      de: "Deine Führungskraft hat sich auch krankgemeldet." } },
+  { min: 0,  text: { en: "Just send a screenshot of the title screen.", de: "Schick einfach einen Screenshot vom Titelbildschirm." } },
 ];
 
-const PS_LINE = "P.S. To anyone else feeling a mysterious illness coming on: don't fight it. Rest is important.";
+// t-online news: headline is the article's own (German) title, date is its publish date,
+// note is a one-line summary. The feed is sorted by date at render time.
+const ARTICLES = [
+  { date: "2026-11-13",
+    url: "https://www.t-online.de/digital/aktuelles/id_101527856/gta-6-von-rockstar-games-hype-um-spiel-auffaellig-viele-urlaubsantraege-.html",
+    headline: "Auffällig viele Finanzbeamte: Diese Beschäftigten nehmen sich für \"GTA 6\" frei",
+    note: { en: "Vacation requests pile up around launch day, and tax office staff stand out.",
+            de: "Rund um den Release häufen sich Urlaubsanträge, besonders bei Finanzbeamten." } },
+  { date: "2026-11-11",
+    url: "https://www.t-online.de/digital/aktuelles/id_101523074/-gta-6-vorab-download-belastet-jetzt-schon-das-internet.html",
+    headline: "Zehnfacher Datenverkehr: Warum \"GTA 6\" jetzt schon das Internet belastet",
+    note: { en: "Pre-loading the roughly 212 GB game sent one provider's overnight traffic to ten times normal.",
+            de: "Der Vorab-Download von rund 212 GB treibt den nächtlichen Datenverkehr bei einem Anbieter aufs Zehnfache." } },
+  { date: "2026-08-28",
+    url: "https://www.t-online.de/digital/aktuelles/id_101409240/-grand-theft-auto-vi-video-zu-meist-erwartetem-videospiel-veroeffentlicht.html",
+    headline: "Nach zwölf Jahren Wartezeit: Netflix zeigt Video zu \"GTA VI\"",
+    note: { en: "Netflix publishes a video about the most anticipated game in years.",
+            de: "Netflix veröffentlicht ein Video zum meisterwarteten Spiel seit Jahren." } },
+  { date: "2026-05-15",
+    url: "https://www.t-online.de/digital/aktuelles/id_101255762/-gta-6-vorbestellung-leak-deutet-auf-vorverkaufs-datum-hin.html",
+    headline: "\"GTA 6\"-Vorbestelldatum wohl geleaked: Doch eine Gruppe muss sich länger gedulden",
+    note: { en: "A leak points to the pre-order date, but one group has to wait longer.",
+            de: "Ein Leak deutet auf das Vorbestelldatum hin, doch eine Gruppe muss länger warten." } },
+];
+
 const PS_COST = 10;
+const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date, local midnight
+const LANG_KEY = "sick-note-lang";
 
 const $ = id => document.getElementById(id);
-
-// Build symptom chart
-$("chart").innerHTML = SYMPTOMS.map(s => `
-  <label class="sym" for="s-${s.id}">
-    <input type="checkbox" id="s-${s.id}" value="${s.id}">
-    <span class="row">
-      <span class="code">${s.code}</span>
-      <span class="name">${s.label}</span>
-      <span class="cost">−${s.cost}</span>
-    </span>
-  </label>`).join("");
-
-function buildSeg(el, name, items, checkedId) {
-  el.innerHTML = items.map(t => `
-    <label for="${name}-${t.id}">
-      <input type="radio" name="${name}" id="${name}-${t.id}" value="${t.id}" ${t.id === checkedId ? "checked" : ""}>
-      <span>${t.label}</span>
-    </label>`).join("");
-}
-buildSeg($("tone"), "tone", TONES, TONES[0].id);
-buildSeg($("ret"), "ret", RETURNS, RETURNS[0].id);
-
-// Default example state
-["fever", "thumb", "light"].forEach(id => { $("s-" + id).checked = true; });
+let lang = "en";
+const t = key => UI[lang][key];
+const tx = item => item.text[lang];
 
 function joinList(parts) {
   if (parts.length <= 1) return parts.join("");
-  return parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
+  return parts.slice(0, -1).join(", ") + ` ${LANGS[lang].and} ` + parts[parts.length - 1];
 }
-
 function picked(name, items) {
   const v = document.querySelector(`input[name="${name}"]:checked`)?.value;
   return items.find(i => i.id === v) || items[0];
 }
+function escapeHtml(s) {
+  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+}
+
+$("lang").innerHTML = Object.entries(LANGS).map(([code, l]) =>
+  `<button type="button" data-lang="${code}" lang="${code}" aria-pressed="false">${l.label}</button>`).join("");
+
+$("fields").innerHTML = FIELDS.map(f => `
+  <label class="field" for="f-${f.id}"><span data-field="${f.id}"></span>
+    <input type="text" id="f-${f.id}" autocomplete="off">
+  </label>`).join("");
+
+$("chart").innerHTML = SYMPTOMS.map(s => `
+  <label class="sym" for="s-${s.id}">
+    <input type="checkbox" id="s-${s.id}" value="${s.id}">
+    <span class="row">
+      <span class="box" aria-hidden="true"></span>
+      <span class="text"><span class="code">${s.code}</span><span class="name" data-sym="${s.id}"></span></span>
+      <span class="cost">−${s.cost}</span>
+    </span>
+  </label>`).join("");
+
+function buildSeg(el, name, items) {
+  el.innerHTML = items.map((it, i) => `
+    <label for="${name}-${it.id}">
+      <input type="radio" name="${name}" id="${name}-${it.id}" value="${it.id}" ${i === 0 ? "checked" : ""}>
+      <span data-seg="${name}-${it.id}"></span>
+    </label>`).join("");
+}
+buildSeg($("tone"), "tone", TONES);
+buildSeg($("ret"), "ret", RETURNS);
+
+// Example starting state
+FIELDS.forEach(f => { $("f-" + f.id).value = f.text.en.example; });
+["fever", "thumb", "light"].forEach(id => { $("s-" + id).checked = true; });
+
+function setLang(next) {
+  const prev = lang;
+  lang = Object.hasOwn(LANGS, next) ? next : "en";
+  document.documentElement.lang = lang;
+  document.title = t("docTitle");
+
+  // Swap example values only where the visitor hasn't typed their own
+  FIELDS.forEach(f => {
+    const input = $("f-" + f.id);
+    if (input.value === f.text[prev].example) input.value = f.text[lang].example;
+  });
+
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  document.querySelectorAll("[data-field]").forEach(el => { el.textContent = tx(FIELDS.find(f => f.id === el.dataset.field)).label; });
+  document.querySelectorAll("[data-sym]").forEach(el => { el.textContent = tx(SYMPTOMS.find(s => s.id === el.dataset.sym)).label; });
+  TONES.forEach(it => { document.querySelector(`[data-seg="tone-${it.id}"]`).textContent = tx(it).label; });
+  RETURNS.forEach(it => { document.querySelector(`[data-seg="ret-${it.id}"]`).textContent = tx(it).label; });
+  document.querySelectorAll("#lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  const fmt = new Intl.DateTimeFormat(LANGS[lang].locale, { day: "numeric", month: "long", year: "numeric" });
+  $("news-list").innerHTML = [...ARTICLES].sort((a, b) => b.date.localeCompare(a.date)).map(a => `
+    <li><a class="news-item" href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">
+      <time class="tag" datetime="${escapeHtml(a.date)}">${escapeHtml(fmt.format(new Date(a.date + "T12:00:00")))}</time>
+      <span><span class="headline" lang="de">${escapeHtml(a.headline)}</span><br><span class="note">${escapeHtml(a.note[lang])}</span></span>
+      <span class="src">${escapeHtml(t("source"))}</span>
+    </a></li>`).join("");
+
+  try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  tick();
+  render();
+}
+
+$("lang").addEventListener("click", e => {
+  const b = e.target.closest("button[data-lang]");
+  if (b && b.dataset.lang !== lang) setLang(b.dataset.lang);
+});
 
 function render() {
-  const name = $("f-name").value.trim() || "Your Name";
-  const boss = $("f-boss").value.trim() || "there";
+  const name = $("f-name").value.trim() || t("fallbackName");
+  const boss = $("f-boss").value.trim() || t("fallbackBoss");
   const cover = $("f-cover").value.trim();
   const syms = SYMPTOMS.filter(s => $("s-" + s.id).checked);
   const tone = picked("tone", TONES);
   const ret = picked("ret", RETURNS);
   const ps = $("f-ps").checked;
+  const T = tx(tone);
 
-  const parts = [tone.open(boss)];
-  const symLine = syms.length ? tone.syms(joinList(syms.map(s => s.line))) : tone.none;
+  const parts = [T.open(boss)];
+  const symLine = syms.length ? T.syms(joinList(syms.map(s => tx(s).line))) : T.none;
   if (symLine) parts.push(symLine);
-  if (cover) parts.push(`If anything urgent comes up, ${cover} has kindly agreed to cover for me. They don't know yet.`);
-  parts.push(ret.line);
-  parts.push(`${tone.sign}\n${name}`);
-  if (ps) parts.push(PS_LINE);
+  if (cover) parts.push(t("cover")(cover));
+  parts.push(tx(ret).line);
+  parts.push(`${T.sign}\n${name}`);
+  if (ps) parts.push(t("ps"));
 
-  $("subject").textContent = tone.subject(name);
+  $("subject").textContent = T.subject(name);
   $("body").textContent = parts.join("\n\n");
 
   const cost = syms.reduce((a, s) => a + s.cost, 0) + tone.cost + ret.cost + (ps ? PS_COST : 0);
@@ -502,7 +817,7 @@ function render() {
   $("score").textContent = score + "%";
   $("bar").style.width = Math.max(score, 3) + "%";
   $("bar").style.background = score >= 60 ? "var(--sea)" : score >= 30 ? "var(--sun)" : "var(--hot)";
-  $("verdict").textContent = VERDICTS.find(v => score >= v.min).text;
+  $("verdict").textContent = VERDICTS.find(v => score >= v.min).text[lang];
 }
 
 document.querySelector("main").addEventListener("input", render);
@@ -516,38 +831,34 @@ function toast(msg) {
 }
 
 $("copy").addEventListener("click", () => {
-  const text = `Subject: ${$("subject").textContent}\n\n${$("body").textContent}`;
+  const text = `${t("subject")}: ${$("subject").textContent}\n\n${$("body").textContent}`;
   const fallback = () => {
     const range = document.createRange();
     range.selectNodeContents($("body"));
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-    toast("Selected. Press Ctrl+C to copy.");
+    toast(t("selected"));
   };
   try {
-    navigator.clipboard.writeText(text).then(() => toast("Copied. Get well soon."), fallback);
+    navigator.clipboard.writeText(text).then(() => toast(t("copied")), fallback);
   } catch (e) { fallback(); }
 });
 
 $("shuffle").addEventListener("click", () => {
   SYMPTOMS.forEach(s => { $("s-" + s.id).checked = Math.random() < 0.4; });
-  const t = TONES[Math.floor(Math.random() * TONES.length)];
-  const r = RETURNS[Math.floor(Math.random() * RETURNS.length)];
-  $("tone-" + t.id).checked = true;
-  $("ret-" + r.id).checked = true;
+  $("tone-" + TONES[Math.floor(Math.random() * TONES.length)].id).checked = true;
+  $("ret-" + RETURNS[Math.floor(Math.random() * RETURNS.length)].id).checked = true;
   $("f-ps").checked = Math.random() < 0.5;
   render();
-  toast("New diagnosis issued.");
+  toast(t("shuffled"));
 });
 
-// Countdown to the last announced release date (local midnight)
-const RELEASE = new Date(2026, 10, 19, 0, 0, 0);
 function tick() {
-  let ms = RELEASE - new Date();
+  const ms = RELEASE - new Date();
   if (ms <= 0) {
     ["cd-d", "cd-h", "cd-m", "cd-s"].forEach(id => { $(id).textContent = "0"; });
-    $("cd-note").textContent = "It's out. Why are you still reading this? Send the email.";
+    $("cd-note").textContent = t("released");
     return;
   }
   const s = Math.floor(ms / 1000);
@@ -555,10 +866,15 @@ function tick() {
   $("cd-h").textContent = String(Math.floor(s / 3600) % 24).padStart(2, "0");
   $("cd-m").textContent = String(Math.floor(s / 60) % 60).padStart(2, "0");
   $("cd-s").textContent = String(s % 60).padStart(2, "0");
+  const date = RELEASE.toLocaleDateString(LANGS[lang].locale, { day: "numeric", month: "short", year: "numeric" });
+  $("cd-note").textContent = t("countdown")(date);
 }
-tick();
+
+let saved = null;
+try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+const browserLang = (navigator.language || "en").slice(0, 2).toLowerCase();
+setLang(Object.hasOwn(LANGS, saved) ? saved : browserLang);
 setInterval(tick, 1000);
-render();
 </script>
 </body>
 </html>
