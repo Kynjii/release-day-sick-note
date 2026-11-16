@@ -353,7 +353,6 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .btn-ghost { background: transparent; color: var(--ink); }
 .toast { font-family: var(--font-mono); font-size: 13px; color: var(--sea); align-self: center; min-height: 1em; }
 
-/* Evidence: t-online articles */
 .reading .wrap { padding-block: 0 48px; }
 .reading .hint { max-width: 65ch; }
 .news-list {
@@ -384,6 +383,8 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .news-item .note { color: var(--muted); font-size: 14px; }
 .news-item .src { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .news-item .src::after { content: " ↗"; }
+.news-status { grid-column: 1 / -1; color: var(--muted); }
+.news-status a { color: var(--hot); font-weight: 500; }
 
 footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 
@@ -491,7 +492,9 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
   <div class="wrap" data-i18n="footer"></div>
 </footer>
 
-<script>
+<script type="module">
+import { cleanNews, NEWS_HOME } from "./lib/news.js";
+
 // Each entry keeps its language-independent data (id, code, cost) once, with text per language.
 
 const LANGS = {
@@ -527,8 +530,11 @@ const UI = {
     selected: "Selected. Press Ctrl+C to copy.",
     shuffled: "New diagnosis issued.",
     readingHeading: "The latest on GTA 6",
-    readingHint: "Recent news from t-online, newest first. The articles are in German.",
+    readingHint: "Recent news from t-online, newest first, updated every hour. The articles are in German.",
     source: "t-online.de · in German",
+    newsLoading: "Loading the latest news…",
+    newsEmpty: "No news to show right now.",
+    newsLink: "Read GTA news on t-online.de",
     footer: "A joke page. Not medical advice, not HR advice, and not affiliated with any game studio. Please don't actually send this to your manager. Or do, and tell us how it went.",
     fallbackName: "Your Name",
     fallbackBoss: "there",
@@ -562,8 +568,11 @@ const UI = {
     selected: "Markiert. Mit Strg+C kopieren.",
     shuffled: "Neue Diagnose ausgestellt.",
     readingHeading: "Das Neueste zu GTA 6",
-    readingHint: "Aktuelle Meldungen von t-online, die neuesten zuerst.",
+    readingHint: "Aktuelle Meldungen von t-online, die neuesten zuerst. Wird stündlich aktualisiert.",
     source: "t-online.de",
+    newsLoading: "Die neuesten Meldungen werden geladen…",
+    newsEmpty: "Gerade keine Meldungen verfügbar.",
+    newsLink: "GTA-News auf t-online.de lesen",
     footer: "Eine Scherzseite. Keine medizinische Beratung, keine Personalberatung und mit keinem Spielestudio verbunden. Bitte schick das nicht wirklich an deine Führungskraft. Oder doch, und erzähl uns, wie es gelaufen ist.",
     fallbackName: "Dein Name",
     fallbackBoss: "zusammen",
@@ -686,31 +695,6 @@ const VERDICTS = [
   { min: 0,  text: { en: "Just send a screenshot of the title screen.", de: "Schick einfach einen Screenshot vom Titelbildschirm." } },
 ];
 
-// t-online news: headline is the article's own (German) title, date is its publish date,
-// note is a one-line summary. The feed is sorted by date at render time.
-const ARTICLES = [
-  { date: "2026-11-13",
-    url: "https://www.t-online.de/digital/aktuelles/id_101527856/gta-6-von-rockstar-games-hype-um-spiel-auffaellig-viele-urlaubsantraege-.html",
-    headline: "Auffällig viele Finanzbeamte: Diese Beschäftigten nehmen sich für \"GTA 6\" frei",
-    note: { en: "Vacation requests pile up around launch day, and tax office staff stand out.",
-            de: "Rund um den Release häufen sich Urlaubsanträge, besonders bei Finanzbeamten." } },
-  { date: "2026-11-11",
-    url: "https://www.t-online.de/digital/aktuelles/id_101523074/-gta-6-vorab-download-belastet-jetzt-schon-das-internet.html",
-    headline: "Zehnfacher Datenverkehr: Warum \"GTA 6\" jetzt schon das Internet belastet",
-    note: { en: "Pre-loading the roughly 212 GB game sent one provider's overnight traffic to ten times normal.",
-            de: "Der Vorab-Download von rund 212 GB treibt den nächtlichen Datenverkehr bei einem Anbieter aufs Zehnfache." } },
-  { date: "2026-08-28",
-    url: "https://www.t-online.de/digital/aktuelles/id_101409240/-grand-theft-auto-vi-video-zu-meist-erwartetem-videospiel-veroeffentlicht.html",
-    headline: "Nach zwölf Jahren Wartezeit: Netflix zeigt Video zu \"GTA VI\"",
-    note: { en: "Netflix publishes a video about the most anticipated game in years.",
-            de: "Netflix veröffentlicht ein Video zum meisterwarteten Spiel seit Jahren." } },
-  { date: "2026-05-15",
-    url: "https://www.t-online.de/digital/aktuelles/id_101255762/-gta-6-vorbestellung-leak-deutet-auf-vorverkaufs-datum-hin.html",
-    headline: "\"GTA 6\"-Vorbestelldatum wohl geleaked: Doch eine Gruppe muss sich länger gedulden",
-    note: { en: "A leak points to the pre-order date, but one group has to wait longer.",
-            de: "Ein Leak deutet auf das Vorbestelldatum hin, doch eine Gruppe muss länger warten." } },
-];
-
 const PS_COST = 10;
 const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date, local midnight
 const LANG_KEY = "sick-note-lang";
@@ -728,8 +712,44 @@ function picked(name, items) {
   const v = document.querySelector(`input[name="${name}"]:checked`)?.value;
   return items.find(i => i.id === v) || items[0];
 }
-function escapeHtml(s) {
-  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function el(tag, props = {}, ...children) {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children);
+  return node;
+}
+
+// null while loading; afterwards the cleaned list from news.json (empty if it failed to load)
+let news = null;
+
+function renderNews() {
+  const list = $("news-list");
+  if (news === null) {
+    list.replaceChildren(el("li", { className: "news-status" }, t("newsLoading")));
+    return;
+  }
+  if (news.length === 0) {
+    list.replaceChildren(el("li", { className: "news-status" }, t("newsEmpty"), " ",
+      el("a", { href: NEWS_HOME, target: "_blank", rel: "noopener noreferrer" }, t("newsLink"))));
+    return;
+  }
+  const fmt = new Intl.DateTimeFormat(LANGS[lang].locale, { day: "numeric", month: "long", year: "numeric" });
+  list.replaceChildren(...news.map(a => el("li", {},
+    el("a", { className: "news-item", href: a.url, target: "_blank", rel: "noopener noreferrer" },
+      el("time", { className: "tag", dateTime: a.date }, fmt.format(new Date(a.date))),
+      el("span", { lang: "de" },
+        el("span", { className: "headline" }, a.title), el("br"),
+        el("span", { className: "note" }, a.summary)),
+      el("span", { className: "src" }, t("source"))))));
+}
+
+async function loadNews() {
+  try {
+    const res = await fetch("news.json", { cache: "no-cache" });
+    news = res.ok ? cleanNews(await res.json()) : [];
+  } catch (e) {
+    news = [];
+  }
+  renderNews();
 }
 
 $("lang").innerHTML = Object.entries(LANGS).map(([code, l]) =>
@@ -783,13 +803,7 @@ function setLang(next) {
   TONES.forEach(it => { document.querySelector(`[data-seg="tone-${it.id}"]`).textContent = tx(it).label; });
   RETURNS.forEach(it => { document.querySelector(`[data-seg="ret-${it.id}"]`).textContent = tx(it).label; });
   document.querySelectorAll("#lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
-  const fmt = new Intl.DateTimeFormat(LANGS[lang].locale, { day: "numeric", month: "long", year: "numeric" });
-  $("news-list").innerHTML = [...ARTICLES].sort((a, b) => b.date.localeCompare(a.date)).map(a => `
-    <li><a class="news-item" href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">
-      <time class="tag" datetime="${escapeHtml(a.date)}">${escapeHtml(fmt.format(new Date(a.date + "T12:00:00")))}</time>
-      <span><span class="headline" lang="de">${escapeHtml(a.headline)}</span><br><span class="note">${escapeHtml(a.note[lang])}</span></span>
-      <span class="src">${escapeHtml(t("source"))}</span>
-    </a></li>`).join("");
+  renderNews();
 
   try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
   tick();
@@ -884,6 +898,7 @@ let saved = null;
 try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
 const browserLang = (navigator.language || "en").slice(0, 2).toLowerCase();
 setLang(Object.hasOwn(LANGS, saved) ? saved : browserLang);
+loadNews();
 setInterval(tick, 1000);
 </script>
 </body>

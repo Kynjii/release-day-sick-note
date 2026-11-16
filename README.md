@@ -1,9 +1,26 @@
 # Release Day Sick Note
 
-A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose a tone and a return date, and copy an email that HR will absolutely believe.
+A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose a tone and a return date, and copy an email that HR will absolutely believe. English and German.
 
 **Live site:** https://kynjii.github.io/release-day-sick-note/
 
-It's a single static `index.html` with no build step. Open it in a browser, or edit it and push to `main` to redeploy.
+## How it works
+
+- `index.html` is the whole page. No build step, no dependencies.
+- The "Latest on GTA 6" section reads `news.json`, which is built from t-online's RSS feeds (Rockstar Games topic, digital, digital news and gaming). Only articles about GTA are kept, newest first, up to 8.
+- `.github/workflows/deploy.yml` deploys the site to GitHub Pages on every push to `main` and once an hour. Each run fetches the feeds, merges them with the `news.json` already live (so articles stay listed after they drop off the feeds), and publishes the result. If every feed fails, the run stops and the live site keeps its current list.
+- `lib/news.js` holds the parsing and filtering rules. The page uses the same file to check `news.json` before showing it.
+
+## Run locally
+
+```bash
+npm test
+npm run news
+python -m http.server 8000
+```
+
+`npm run news` writes `news.json` next to `index.html` (it's git-ignored). Then open http://localhost:8000.
+
+GitHub pauses scheduled workflows in public repos after 60 days without commits. Run the workflow by hand from the Actions tab, or push any commit, to start it again.
 
 Not medical advice, not HR advice, and not affiliated with any game studio.

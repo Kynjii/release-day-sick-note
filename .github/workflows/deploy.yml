@@ -1,0 +1,43 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 * * * *" # hourly news refresh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - id: pages
+        uses: actions/configure-pages@v5
+      - name: Build site with the latest news
+        run: |
+          mkdir -p _site/lib
+          cp index.html _site/
+          cp lib/news.js _site/lib/
+          node scripts/update-news.js _site/news.json "${{ steps.pages.outputs.base_url }}/news.json"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

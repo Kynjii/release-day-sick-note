@@ -1,0 +1,10 @@
+{
+  "name": "release-day-sick-note",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test lib/",
+    "news": "node scripts/update-news.js news.json"
+  }
+}
