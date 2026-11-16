@@ -354,7 +354,7 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .toast { font-family: var(--font-mono); font-size: 13px; color: var(--sea); align-self: center; min-height: 1em; }
 
 .reading .wrap { padding-block: 0 48px; }
-.reading .hint { max-width: 65ch; }
+.reading h2 { margin-bottom: 16px; }
 .news-list {
   list-style: none;
   margin: 0;
@@ -483,7 +483,6 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 <section class="reading" aria-labelledby="h-reading">
   <div class="wrap">
     <h2 id="h-reading" data-i18n="readingHeading"></h2>
-    <p class="hint" data-i18n="readingHint"></p>
     <ul class="news-list" id="news-list"></ul>
   </div>
 </section>
@@ -530,7 +529,6 @@ const UI = {
     selected: "Selected. Press Ctrl+C to copy.",
     shuffled: "New diagnosis issued.",
     readingHeading: "The latest on GTA 6",
-    readingHint: "Recent news from t-online, newest first, updated every hour. The articles are in German.",
     source: "t-online.de · in German",
     newsLoading: "Loading the latest news…",
     newsEmpty: "No news to show right now.",
@@ -568,7 +566,6 @@ const UI = {
     selected: "Markiert. Mit Strg+C kopieren.",
     shuffled: "Neue Diagnose ausgestellt.",
     readingHeading: "Das Neueste zu GTA 6",
-    readingHint: "Aktuelle Meldungen von t-online, die neuesten zuerst. Wird stündlich aktualisiert.",
     source: "t-online.de",
     newsLoading: "Die neuesten Meldungen werden geladen…",
     newsEmpty: "Gerade keine Meldungen verfügbar.",
