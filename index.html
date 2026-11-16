@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Calling in sick on GTA 6 release day? Pick your symptoms, choose a tone, and copy an email HR will absolutely believe.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤒</text></svg>">
+<title>Release Day Sick Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+body { margin: 0; }
+[hidden] { display: none !important; }
+/* Layout: sunset hero band with a striped sun, then a two-column workbench: symptom chart on the left, live email + believability meter on the right. */
+:root {
+  --bg: #FFE9DF;
+  --surface: #FFF8F4;
+  --ink: #2A1636;
+  --muted: #7A5A72;
+  --hot: #D92A63;
+  --sea: #0B8793;
+  --sun: #FF9F1C;
+  --line: #F0C6B8;
+  --sky-top: #FF7A59;
+  --sky-bottom: #FFC56E;
+  --on-hot: #FFFFFF;
+  --font-display: "Bungee", "Impact", "Arial Black", sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
+    --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
+    --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
+  --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
+  --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+  color: #FFFFFF;
+  overflow: hidden;
+  position: relative;
+}
+.hero .wrap {
+  padding-block: 40px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.9;
+  margin: 0 0 8px;
+}
+h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 0.95;
+  margin: 0 0 16px;
+  text-wrap: balance;
+  text-shadow: 3px 3px 0 rgba(42, 22, 54, 0.35);
+}
+.lede {
+  max-width: 52ch;
+  margin: 0 0 24px;
+  font-size: 17px;
+}
+.countdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.tick {
+  background: rgba(26, 16, 48, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  padding: 8px 14px;
+  min-width: 76px;
+  text-align: center;
+}
+.tick b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.tick span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.countdown-note {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: -20px 0 32px;
+  opacity: 0.85;
+}
+.sun {
+  width: clamp(140px, 22vw, 240px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  aspect-ratio: 2 / 1;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 14px, var(--sky-bottom) 14px 20px),
+    linear-gradient(180deg, #FFE36E, var(--sun));
+  background-position: 0 0, 0 0;
+  -webkit-mask: linear-gradient(#000 0 0);
+  align-self: end;
+}
+.horizon {
+  height: 14px;
+  background: var(--bg);
+  border-radius: 14px 14px 0 0;
+}
+
+/* ---------- Main ---------- */
+main .wrap {
+  padding-block: 32px 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+section { min-width: 0; }
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  margin: 0 0 4px;
+}
+.hint { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
+.block { display: grid; gap: 4px; margin-bottom: 32px; }
+
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+label.field { display: grid; gap: 4px; font-size: 14px; font-weight: 500; }
+input[type="text"] {
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+}
+input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset: 1px; border-color: var(--sea); }
+
+/* Symptom chart */
+.chart { display: grid; gap: 8px; }
+.sym { position: relative; display: block; cursor: pointer; }
+.sym input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.sym .row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.sym .code { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.sym .name { font-weight: 500; }
+.sym .cost { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sym:hover .row { border-color: var(--hot); }
+.sym input:checked + .row { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 12%, var(--surface)); }
+.sym input:checked + .row .code { color: var(--hot); font-weight: 600; }
+.sym input:focus-visible + .row { outline: 3px solid var(--sea); outline-offset: 2px; }
+
+/* Segmented choices */
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg label { position: relative; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+}
+.seg input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.seg input:focus-visible + span { outline: 3px solid var(--sea); outline-offset: 2px; }
+
+.toggle { display: flex; gap: 10px; align-items: center; font-size: 15px; cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--hot); }
+
+/* Output */
+.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; }
+.meter {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.meter-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.meter-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.meter-num { font-family: var(--font-display); font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums; }
+.bar { height: 12px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 10px 0 8px; }
+.bar i { display: block; height: 100%; width: 50%; border-radius: inherit; background: var(--sea); transition: width 0.35s ease, background 0.35s; }
+.verdict { margin: 0; font-weight: 500; }
+
+.email {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.email-head {
+  display: grid;
+  gap: 2px;
+  padding: 14px 18px;
+  border-bottom: 1.5px dashed var(--line);
+  font-size: 14px;
+}
+.email-head .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.email-head .subj { font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
+.email-body {
+  padding: 16px 18px 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  margin: 0;
+  font-family: var(--font-body);
+}
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+button:active { transform: translateY(1px); }
+button:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.btn-primary { background: var(--hot); border-color: var(--hot); color: var(--on-hot); }
+.btn-ghost { background: transparent; color: var(--ink); }
+.toast { font-family: var(--font-mono); font-size: 13px; color: var(--sea); align-self: center; min-height: 1em; }
+
+footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 820px) {
+  main .wrap { grid-template-columns: minmax(0, 1fr); }
+  .out { position: static; }
+}
+@media (max-width: 560px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); }
+  .sun { width: 160px; justify-self: center; }
+  .sym .row { grid-template-columns: 52px minmax(0, 1fr); }
+  .sym .cost { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Department of Couch Medicine · Form SD-6</p>
+      <h1>Release Day Sick Note</h1>
+      <p class="lede">Your symptoms are real. The timing is a coincidence. Pick a diagnosis, choose how hard to try, and copy an email that HR will absolutely believe.</p>
+      <div class="countdown" id="countdown" aria-live="polite">
+        <div class="tick"><b id="cd-d">0</b><span>days</span></div>
+        <div class="tick"><b id="cd-h">0</b><span>hours</span></div>
+        <div class="tick"><b id="cd-m">0</b><span>min</span></div>
+        <div class="tick"><b id="cd-s">0</b><span>sec</span></div>
+      </div>
+      <p class="countdown-note" id="cd-note">Until GTA 6 on 19 Nov 2026, the last announced date. Delays are a known side effect.</p>
+    </div>
+    <div class="sun" aria-hidden="true"></div>
+  </div>
+  <div class="horizon"></div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section aria-labelledby="h-form">
+      <h2 id="h-form" class="visually-plain">1. Patient details</h2>
+      <p class="hint">Who is sick, who needs to know, and who gets stuck with your work.</p>
+      <div class="block">
+        <div class="fields">
+          <label class="field" for="f-name">Your name
+            <input type="text" id="f-name" value="Alex" autocomplete="off">
+          </label>
+          <label class="field" for="f-boss">Manager
+            <input type="text" id="f-boss" value="Jordan" autocomplete="off">
+          </label>
+          <label class="field" for="f-cover">Coworker to volunteer
+            <input type="text" id="f-cover" value="Sam from Accounting" autocomplete="off">
+          </label>
+        </div>
+      </div>
+
+      <h2>2. Symptoms</h2>
+      <p class="hint">Each one costs believability. The number on the right is how much.</p>
+      <div class="block chart" id="chart"></div>
+
+      <h2>3. Tone</h2>
+      <p class="hint">How much effort you can spare before the servers go live.</p>
+      <div class="block seg" id="tone" role="radiogroup" aria-label="Tone"></div>
+
+      <h2>4. Expected return</h2>
+      <p class="hint">Be realistic. Your manager can count.</p>
+      <div class="block seg" id="ret" role="radiogroup" aria-label="Expected return"></div>
+
+      <div class="block">
+        <label class="toggle" for="f-ps"><input type="checkbox" id="f-ps"> Add a suspicious P.S. for your coworkers</label>
+      </div>
+    </section>
+
+    <section class="out" aria-labelledby="h-out">
+      <h2 id="h-out" hidden>Your email</h2>
+      <div class="meter">
+        <div class="meter-top">
+          <span class="meter-label">Believability</span>
+          <span class="meter-num" id="score">0%</span>
+        </div>
+        <div class="bar"><i id="bar"></i></div>
+        <p class="verdict" id="verdict"></p>
+      </div>
+
+      <article class="email">
+        <div class="email-head">
+          <span class="k">Subject</span>
+          <span class="subj" id="subject"></span>
+        </div>
+        <pre class="email-body" id="body"></pre>
+      </article>
+
+      <div class="actions">
+        <button class="btn-primary" id="copy" type="button">Copy email</button>
+        <button class="btn-ghost" id="shuffle" type="button">Random diagnosis</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">A joke page. Not medical advice, not HR advice, and not affiliated with any game studio. Please don't actually send this to your manager. Or do, and tell us how it went.</div>
+</footer>
+
+<script>
+const SYMPTOMS = [
+  { id: "fever",   code: "VC-01", label: "Vice City Fever",         cost: 8,  line: "a high temperature and a strong urge to be somewhere with palm trees" },
+  { id: "thumb",   code: "TH-02", label: "Thumb stiffness",         cost: 10, line: "stiff thumbs that my doctor says need a full day of repetitive motion therapy" },
+  { id: "light",   code: "PH-03", label: "Sensitivity to daylight", cost: 6,  line: "sensitivity to daylight, so I'll be resting with the curtains closed" },
+  { id: "hearing", code: "AU-04", label: "Selective hearing loss",  cost: 12, line: "a hearing problem that blocks out phone calls and Slack notifications" },
+  { id: "tired",   code: "SL-05", label: "Mysterious exhaustion",   cost: 15, line: "exhaustion from being up very late last night for reasons unrelated to any midnight launch" },
+  { id: "wanted",  code: "WL-06", label: "Five-star anxiety",       cost: 9,  line: "a racing heart and a constant feeling that I'm being chased" },
+  { id: "loading", code: "LD-07", label: "Brain buffering",         cost: 7,  line: "a foggy head that feels stuck on a loading screen" },
+  { id: "spread",  code: "CX-08", label: "Highly contagious",       cost: 14, line: "something highly contagious that mostly affects people aged 18 to 45" },
+];
+
+const TONES = [
+  { id: "pro",    label: "Professional",           cost: 0,
+    subject: n => `Sick day: ${n}`,
+    open: b => `Hi ${b},\n\nI woke up unwell this morning and won't be able to work today.`,
+    syms: l => `I'm dealing with ${l}.`,
+    none: "I'd rather not go into detail.",
+    sign: "Best regards," },
+  { id: "drama",  label: "Dramatic",               cost: 10,
+    subject: () => `I may not survive the day`,
+    open: b => `Dear ${b},\n\nI write to you from what may be my deathbed.`,
+    syms: l => `My symptoms include ${l}. Doctors are baffled. One of them wept.`,
+    none: "My symptoms are too terrible to describe.",
+    sign: "With what strength I have left," },
+  { id: "detail", label: "Suspiciously detailed",  cost: 18,
+    subject: () => `Absence notice (please read all 4 sections)`,
+    open: b => `Hi ${b},\n\nAt exactly 6:00 AM this morning, which is a completely normal time to be awake on a Thursday, I came down with something.`,
+    syms: l => `Specifically, I have ${l}. I have documented all of this in a spreadsheet, available on request.`,
+    none: "I have documented the symptoms in a spreadsheet, available on request.",
+    sign: "Thanks in advance for not asking follow-up questions," },
+  { id: "lazy",   label: "Barely trying",          cost: 25,
+    subject: () => `sick`,
+    open: b => `hey ${b.toLowerCase()}\n\nsick. not coming in.`,
+    syms: l => `symptoms: ${l.toLowerCase()}.`,
+    none: "",
+    sign: "ttyl," },
+];
+
+const RETURNS = [
+  { id: "tomorrow", label: "Tomorrow",           cost: 0,  line: "I expect to be back tomorrow." },
+  { id: "monday",   label: "Next week",          cost: 8,  line: "I should be well enough to return early next week." },
+  { id: "story",    label: "After the main story", cost: 30, line: "I expect to be back once I finish the main story. Recovery time varies." },
+  { id: "hundred",  label: "At 100% completion", cost: 45, line: "I'll be back when I reach 100% completion. Please don't give away my desk." },
+];
+
+const VERDICTS = [
+  { min: 80, text: "HR will never know." },
+  { min: 60, text: "Your manager raises one eyebrow." },
+  { min: 40, text: "Your manager checks your online status." },
+  { min: 20, text: "Your manager has also called in sick." },
+  { min: 0,  text: "Just send a screenshot of the title screen." },
+];
+
+const PS_LINE = "P.S. To anyone else feeling a mysterious illness coming on: don't fight it. Rest is important.";
+const PS_COST = 10;
+
+const $ = id => document.getElementById(id);
+
+// Build symptom chart
+$("chart").innerHTML = SYMPTOMS.map(s => `
+  <label class="sym" for="s-${s.id}">
+    <input type="checkbox" id="s-${s.id}" value="${s.id}">
+    <span class="row">
+      <span class="code">${s.code}</span>
+      <span class="name">${s.label}</span>
+      <span class="cost">−${s.cost}</span>
+    </span>
+  </label>`).join("");
+
+function buildSeg(el, name, items, checkedId) {
+  el.innerHTML = items.map(t => `
+    <label for="${name}-${t.id}">
+      <input type="radio" name="${name}" id="${name}-${t.id}" value="${t.id}" ${t.id === checkedId ? "checked" : ""}>
+      <span>${t.label}</span>
+    </label>`).join("");
+}
+buildSeg($("tone"), "tone", TONES, TONES[0].id);
+buildSeg($("ret"), "ret", RETURNS, RETURNS[0].id);
+
+// Default example state
+["fever", "thumb", "light"].forEach(id => { $("s-" + id).checked = true; });
+
+function joinList(parts) {
+  if (parts.length <= 1) return parts.join("");
+  return parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
+}
+
+function picked(name, items) {
+  const v = document.querySelector(`input[name="${name}"]:checked`)?.value;
+  return items.find(i => i.id === v) || items[0];
+}
+
+function render() {
+  const name = $("f-name").value.trim() || "Your Name";
+  const boss = $("f-boss").value.trim() || "there";
+  const cover = $("f-cover").value.trim();
+  const syms = SYMPTOMS.filter(s => $("s-" + s.id).checked);
+  const tone = picked("tone", TONES);
+  const ret = picked("ret", RETURNS);
+  const ps = $("f-ps").checked;
+
+  const parts = [tone.open(boss)];
+  const symLine = syms.length ? tone.syms(joinList(syms.map(s => s.line))) : tone.none;
+  if (symLine) parts.push(symLine);
+  if (cover) parts.push(`If anything urgent comes up, ${cover} has kindly agreed to cover for me. They don't know yet.`);
+  parts.push(ret.line);
+  parts.push(`${tone.sign}\n${name}`);
+  if (ps) parts.push(PS_LINE);
+
+  $("subject").textContent = tone.subject(name);
+  $("body").textContent = parts.join("\n\n");
+
+  const cost = syms.reduce((a, s) => a + s.cost, 0) + tone.cost + ret.cost + (ps ? PS_COST : 0);
+  const score = Math.max(0, Math.min(100, 100 - cost));
+  $("score").textContent = score + "%";
+  $("bar").style.width = Math.max(score, 3) + "%";
+  $("bar").style.background = score >= 60 ? "var(--sea)" : score >= 30 ? "var(--sun)" : "var(--hot)";
+  $("verdict").textContent = VERDICTS.find(v => score >= v.min).text;
+}
+
+document.querySelector("main").addEventListener("input", render);
+document.querySelector("main").addEventListener("change", render);
+
+let toastTimer;
+function toast(msg) {
+  $("toast").textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $("toast").textContent = ""; }, 2400);
+}
+
+$("copy").addEventListener("click", () => {
+  const text = `Subject: ${$("subject").textContent}\n\n${$("body").textContent}`;
+  const fallback = () => {
+    const range = document.createRange();
+    range.selectNodeContents($("body"));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    toast("Selected. Press Ctrl+C to copy.");
+  };
+  try {
+    navigator.clipboard.writeText(text).then(() => toast("Copied. Get well soon."), fallback);
+  } catch (e) { fallback(); }
+});
+
+$("shuffle").addEventListener("click", () => {
+  SYMPTOMS.forEach(s => { $("s-" + s.id).checked = Math.random() < 0.4; });
+  const t = TONES[Math.floor(Math.random() * TONES.length)];
+  const r = RETURNS[Math.floor(Math.random() * RETURNS.length)];
+  $("tone-" + t.id).checked = true;
+  $("ret-" + r.id).checked = true;
+  $("f-ps").checked = Math.random() < 0.5;
+  render();
+  toast("New diagnosis issued.");
+});
+
+// Countdown to the last announced release date (local midnight)
+const RELEASE = new Date(2026, 10, 19, 0, 0, 0);
+function tick() {
+  let ms = RELEASE - new Date();
+  if (ms <= 0) {
+    ["cd-d", "cd-h", "cd-m", "cd-s"].forEach(id => { $(id).textContent = "0"; });
+    $("cd-note").textContent = "It's out. Why are you still reading this? Send the email.";
+    return;
+  }
+  const s = Math.floor(ms / 1000);
+  $("cd-d").textContent = Math.floor(s / 86400);
+  $("cd-h").textContent = String(Math.floor(s / 3600) % 24).padStart(2, "0");
+  $("cd-m").textContent = String(Math.floor(s / 60) % 60).padStart(2, "0");
+  $("cd-s").textContent = String(s % 60).padStart(2, "0");
+}
+tick();
+setInterval(tick, 1000);
+render();
+</script>
+</body>
+</html>
