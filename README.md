@@ -7,7 +7,7 @@ A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose
 ## How it works
 
 - `index.html` is the whole page. No build step, no dependencies.
-- The "Latest on GTA 6" section reads `news.json`, built from the RSS feeds of t-online (Rockstar Games topic, digital, digital news, gaming) and GIGA (GTA 6 topic, games). Only articles about GTA are kept, newest first, up to 8 per source. Visitors switch between sources with the buttons above the list; the choice is remembered.
+- The "Latest on GTA 6" section reads `news.json`, built from the RSS feeds of t-online (Rockstar Games topic, digital, digital news, gaming) and GIGA (GTA 6 topic, games). Only articles about GTA are kept, newest first, up to 8 per source. Tabs above the list show all sources together (default) or one at a time; the choice is remembered.
 - Sources, their feeds and the hosts their links may point to are all defined in `SOURCES` in `lib/news.js`. To add a source, add an entry there.
 - `.github/workflows/deploy.yml` deploys the site to GitHub Pages on every push to `main` and once an hour. Each run fetches the feeds, merges them with the `news.json` already live (so articles stay listed after they drop off the feeds), and publishes the result. If every feed fails, the run stops and the live site keeps its current list.
 - `lib/news.js` holds the parsing and filtering rules. The page uses the same file to check `news.json` before showing it.

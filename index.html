@@ -358,6 +358,30 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .reading .wrap { padding-block: 0 48px; }
 .reading-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .reading-head h2 { margin: 0; }
+.tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.tabs label { position: relative; cursor: pointer; }
+.tabs input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.tabs span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.tabs label:hover span { color: var(--ink); }
+.tabs input:checked + span { background: var(--ink); color: var(--bg); }
+.tabs input:focus-visible + span { outline: 3px solid var(--sea); outline-offset: 2px; }
 .news-list {
   list-style: none;
   margin: 0;
@@ -487,7 +511,7 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
   <div class="wrap">
     <div class="reading-head">
       <h2 id="h-reading" data-i18n="readingHeading"></h2>
-      <div class="seg" id="news-source" role="radiogroup" data-i18n-aria="sourceLabel"></div>
+      <div class="tabs" id="news-source" role="radiogroup" data-i18n-aria="sourceLabel"></div>
     </div>
     <ul class="news-list" id="news-list"></ul>
   </div>
@@ -537,6 +561,7 @@ const UI = {
     readingHeading: "The latest on GTA 6",
     source: site => `${site} · in German`,
     sourceLabel: "News source",
+    allSources: "All",
     newsLoading: "Loading the latest news…",
     newsEmpty: "No news to show right now.",
     newsLink: site => `Read GTA news on ${site}`,
@@ -575,6 +600,7 @@ const UI = {
     readingHeading: "Das Neueste zu GTA 6",
     source: site => site,
     sourceLabel: "Nachrichtenquelle",
+    allSources: "Alle",
     newsLoading: "Die neuesten Meldungen werden geladen…",
     newsEmpty: "Gerade keine Meldungen verfügbar.",
     newsLink: site => `GTA-News auf ${site} lesen`,
@@ -727,7 +753,9 @@ function el(tag, props = {}, ...children) {
 
 // null while loading; afterwards the cleaned list from news.json (empty if it failed to load)
 let news = null;
-let newsSource = Object.keys(SOURCES)[0];
+const ALL = "all";
+const NEWS_FILTERS = [ALL, ...Object.keys(SOURCES)];
+let newsSource = ALL;
 const siteOf = id => new URL(SOURCES[id].home).host.replace(/^www\./, "");
 
 function renderNews() {
@@ -736,11 +764,12 @@ function renderNews() {
     list.replaceChildren(el("li", { className: "news-status" }, t("newsLoading")));
     return;
   }
-  const site = siteOf(newsSource);
-  const items = news.filter(a => sourceOf(a.url) === newsSource);
+  const items = newsSource === ALL ? news : news.filter(a => sourceOf(a.url) === newsSource);
   if (items.length === 0) {
+    const ids = newsSource === ALL ? Object.keys(SOURCES) : [newsSource];
     list.replaceChildren(el("li", { className: "news-status" }, t("newsEmpty"), " ",
-      el("a", { href: SOURCES[newsSource].home, target: "_blank", rel: "noopener noreferrer" }, t("newsLink")(site))));
+      ...ids.flatMap((id, i) => [i ? " · " : "",
+        el("a", { href: SOURCES[id].home, target: "_blank", rel: "noopener noreferrer" }, t("newsLink")(siteOf(id)))])));
     return;
   }
   const fmt = new Intl.DateTimeFormat(LANGS[lang].locale, { day: "numeric", month: "long", year: "numeric" });
@@ -750,7 +779,7 @@ function renderNews() {
       el("span", { lang: "de" },
         el("span", { className: "headline" }, a.title), el("br"),
         el("span", { className: "note" }, a.summary)),
-      el("span", { className: "src" }, t("source")(site))))));
+      el("span", { className: "src" }, t("source")(siteOf(sourceOf(a.url))))))));
 }
 
 async function loadNews() {
@@ -790,8 +819,7 @@ function buildSeg(el, name, items) {
 }
 buildSeg($("tone"), "tone", TONES);
 buildSeg($("ret"), "ret", RETURNS);
-buildSeg($("news-source"), "src", Object.keys(SOURCES).map(id => ({ id })));
-Object.entries(SOURCES).forEach(([id, s]) => { document.querySelector(`[data-seg="src-${id}"]`).textContent = s.label; });
+buildSeg($("news-source"), "src", NEWS_FILTERS.map(id => ({ id })));
 
 // Example starting state
 FIELDS.forEach(f => { $("f-" + f.id).value = f.text[DEFAULT_LANG].example; });
@@ -815,6 +843,7 @@ function setLang(next) {
   document.querySelectorAll("[data-sym]").forEach(el => { el.textContent = tx(SYMPTOMS.find(s => s.id === el.dataset.sym)).label; });
   TONES.forEach(it => { document.querySelector(`[data-seg="tone-${it.id}"]`).textContent = tx(it).label; });
   RETURNS.forEach(it => { document.querySelector(`[data-seg="ret-${it.id}"]`).textContent = tx(it).label; });
+  NEWS_FILTERS.forEach(id => { document.querySelector(`[data-seg="src-${id}"]`).textContent = id === ALL ? t("allSources") : SOURCES[id].label; });
   document.querySelectorAll("#lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   renderNews();
 
@@ -913,10 +942,10 @@ setLang(saved);
 
 let savedSource = null;
 try { savedSource = localStorage.getItem(SOURCE_KEY); } catch (e) {}
-if (Object.hasOwn(SOURCES, savedSource)) newsSource = savedSource;
+if (NEWS_FILTERS.includes(savedSource)) newsSource = savedSource;
 $("src-" + newsSource).checked = true;
 $("news-source").addEventListener("change", e => {
-  if (!Object.hasOwn(SOURCES, e.target.value)) return;
+  if (!NEWS_FILTERS.includes(e.target.value)) return;
   newsSource = e.target.value;
   try { localStorage.setItem(SOURCE_KEY, newsSource); } catch (err) {}
   renderNews();
