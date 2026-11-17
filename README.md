@@ -1,13 +1,14 @@
 # Release Day Sick Note
 
-A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose a tone and a return date, and copy an email that HR will absolutely believe. English and German.
+A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose a tone and a return date, and copy an email that HR will absolutely believe. German by default, with an English switch.
 
 **Live site:** https://kynjii.github.io/release-day-sick-note/
 
 ## How it works
 
 - `index.html` is the whole page. No build step, no dependencies.
-- The "Latest on GTA 6" section reads `news.json`, which is built from t-online's RSS feeds (Rockstar Games topic, digital, digital news and gaming). Only articles about GTA are kept, newest first, up to 8.
+- The "Latest on GTA 6" section reads `news.json`, built from the RSS feeds of t-online (Rockstar Games topic, digital, digital news, gaming) and GIGA (GTA 6 topic, games). Only articles about GTA are kept, newest first, up to 8 per source. Visitors switch between sources with the buttons above the list; the choice is remembered.
+- Sources, their feeds and the hosts their links may point to are all defined in `SOURCES` in `lib/news.js`. To add a source, add an entry there.
 - `.github/workflows/deploy.yml` deploys the site to GitHub Pages on every push to `main` and once an hour. Each run fetches the feeds, merges them with the `news.json` already live (so articles stay listed after they drop off the feeds), and publishes the result. If every feed fails, the run stops and the live site keeps its current list.
 - `lib/news.js` holds the parsing and filtering rules. The page uses the same file to check `news.json` before showing it.
 

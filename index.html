@@ -356,7 +356,8 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .toast { font-family: var(--font-mono); font-size: 13px; color: var(--sea); align-self: center; min-height: 1em; }
 
 .reading .wrap { padding-block: 0 48px; }
-.reading h2 { margin-bottom: 16px; }
+.reading-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.reading-head h2 { margin: 0; }
 .news-list {
   list-style: none;
   margin: 0;
@@ -484,7 +485,10 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 
 <section class="reading" aria-labelledby="h-reading">
   <div class="wrap">
-    <h2 id="h-reading" data-i18n="readingHeading"></h2>
+    <div class="reading-head">
+      <h2 id="h-reading" data-i18n="readingHeading"></h2>
+      <div class="seg" id="news-source" role="radiogroup" data-i18n-aria="sourceLabel"></div>
+    </div>
     <ul class="news-list" id="news-list"></ul>
   </div>
 </section>
@@ -494,7 +498,7 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 </footer>
 
 <script type="module">
-import { cleanNews, NEWS_HOME } from "./lib/news.js";
+import { cleanNews, sourceOf, SOURCES } from "./lib/news.js";
 
 // Each entry keeps its language-independent data (id, code, cost) once, with text per language.
 
@@ -531,10 +535,11 @@ const UI = {
     selected: "Selected. Press Ctrl+C to copy.",
     shuffled: "New diagnosis issued.",
     readingHeading: "The latest on GTA 6",
-    source: "t-online.de · in German",
+    source: site => `${site} · in German`,
+    sourceLabel: "News source",
     newsLoading: "Loading the latest news…",
     newsEmpty: "No news to show right now.",
-    newsLink: "Read GTA news on t-online.de",
+    newsLink: site => `Read GTA news on ${site}`,
     footer: "A joke page. Not medical advice, not HR advice, and not affiliated with any game studio. Please don't actually send this to your manager. Or do, and tell us how it went.",
     fallbackName: "Your Name",
     fallbackBoss: "there",
@@ -568,10 +573,11 @@ const UI = {
     selected: "Markiert. Mit Strg+C kopieren.",
     shuffled: "Neue Diagnose ausgestellt.",
     readingHeading: "Das Neueste zu GTA 6",
-    source: "t-online.de",
+    source: site => site,
+    sourceLabel: "Nachrichtenquelle",
     newsLoading: "Die neuesten Meldungen werden geladen…",
     newsEmpty: "Gerade keine Meldungen verfügbar.",
-    newsLink: "GTA-News auf t-online.de lesen",
+    newsLink: site => `GTA-News auf ${site} lesen`,
     footer: "Eine Scherzseite. Keine medizinische Beratung, keine Personalberatung und mit keinem Spielestudio verbunden. Bitte schick das nicht wirklich an deine Führungskraft. Oder doch, und erzähl uns, wie es gelaufen ist.",
     fallbackName: "Dein Name",
     fallbackBoss: "zusammen",
@@ -697,6 +703,7 @@ const VERDICTS = [
 const PS_COST = 10;
 const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date, local midnight
 const LANG_KEY = "sick-note-lang";
+const SOURCE_KEY = "sick-note-source";
 const DEFAULT_LANG = "de"; // shown until the visitor picks a language
 
 const $ = id => document.getElementById(id);
@@ -720,6 +727,8 @@ function el(tag, props = {}, ...children) {
 
 // null while loading; afterwards the cleaned list from news.json (empty if it failed to load)
 let news = null;
+let newsSource = Object.keys(SOURCES)[0];
+const siteOf = id => new URL(SOURCES[id].home).host.replace(/^www\./, "");
 
 function renderNews() {
   const list = $("news-list");
@@ -727,19 +736,21 @@ function renderNews() {
     list.replaceChildren(el("li", { className: "news-status" }, t("newsLoading")));
     return;
   }
-  if (news.length === 0) {
+  const site = siteOf(newsSource);
+  const items = news.filter(a => sourceOf(a.url) === newsSource);
+  if (items.length === 0) {
     list.replaceChildren(el("li", { className: "news-status" }, t("newsEmpty"), " ",
-      el("a", { href: NEWS_HOME, target: "_blank", rel: "noopener noreferrer" }, t("newsLink"))));
+      el("a", { href: SOURCES[newsSource].home, target: "_blank", rel: "noopener noreferrer" }, t("newsLink")(site))));
     return;
   }
   const fmt = new Intl.DateTimeFormat(LANGS[lang].locale, { day: "numeric", month: "long", year: "numeric" });
-  list.replaceChildren(...news.map(a => el("li", {},
+  list.replaceChildren(...items.map(a => el("li", {},
     el("a", { className: "news-item", href: a.url, target: "_blank", rel: "noopener noreferrer" },
       el("time", { className: "tag", dateTime: a.date }, fmt.format(new Date(a.date))),
       el("span", { lang: "de" },
         el("span", { className: "headline" }, a.title), el("br"),
         el("span", { className: "note" }, a.summary)),
-      el("span", { className: "src" }, t("source"))))));
+      el("span", { className: "src" }, t("source")(site))))));
 }
 
 async function loadNews() {
@@ -779,6 +790,8 @@ function buildSeg(el, name, items) {
 }
 buildSeg($("tone"), "tone", TONES);
 buildSeg($("ret"), "ret", RETURNS);
+buildSeg($("news-source"), "src", Object.keys(SOURCES).map(id => ({ id })));
+Object.entries(SOURCES).forEach(([id, s]) => { document.querySelector(`[data-seg="src-${id}"]`).textContent = s.label; });
 
 // Example starting state
 FIELDS.forEach(f => { $("f-" + f.id).value = f.text[DEFAULT_LANG].example; });
@@ -897,6 +910,17 @@ function tick() {
 let saved = null;
 try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
 setLang(saved);
+
+let savedSource = null;
+try { savedSource = localStorage.getItem(SOURCE_KEY); } catch (e) {}
+if (Object.hasOwn(SOURCES, savedSource)) newsSource = savedSource;
+$("src-" + newsSource).checked = true;
+$("news-source").addEventListener("change", e => {
+  if (!Object.hasOwn(SOURCES, e.target.value)) return;
+  newsSource = e.target.value;
+  try { localStorage.setItem(SOURCE_KEY, newsSource); } catch (err) {}
+  renderNews();
+});
 loadNews();
 setInterval(tick, 1000);
 </script>

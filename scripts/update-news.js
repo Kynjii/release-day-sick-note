@@ -1,10 +1,11 @@
-// Builds news.json from t-online's RSS feeds, keeping articles already published on the live site.
+// Builds news.json from every source's RSS feeds, keeping articles already published on the live site.
 // Usage: node scripts/update-news.js <output path> [previous news.json URL]
 import { writeFile } from "node:fs/promises";
-import { FEEDS, parseFeed, mergeNews } from "../lib/news.js";
+import { SOURCES, parseFeed, mergeNews } from "../lib/news.js";
 
 const [out = "news.json", previousUrl] = process.argv.slice(2);
 const TIMEOUT_MS = 20_000;
+const FEEDS = Object.values(SOURCES).flatMap(s => s.feeds);
 
 async function get(url) {
   const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS), headers: { "user-agent": "release-day-sick-note-news/1.0" } });
