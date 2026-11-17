@@ -130,7 +130,7 @@ h1 {
   aspect-ratio: 2 / 1;
   background:
     repeating-linear-gradient(180deg, transparent 0 14px, var(--sky-bottom) 14px 20px),
-    linear-gradient(180deg, #FFE36E, var(--sun));
+    linear-gradient(180deg, var(--sun-top), var(--sun));
   align-self: end;
 }
 .horizon {
@@ -254,7 +254,7 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .seg input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .seg input:focus-visible + span { outline: 3px solid var(--sea); outline-offset: 2px; }
 
-.toggle { display: flex; gap: 10px; align-items: center; font-size: 15px; cursor: pointer; }
+.toggle { display: flex; gap: 10px; align-items: center; min-height: 44px; font-size: 15px; cursor: pointer; }
 .toggle input { width: 18px; height: 18px; accent-color: var(--hot); flex: none; }
 
 .out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; }
@@ -381,6 +381,16 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
   .hero-grid { grid-template-columns: minmax(0, 1fr); }
   .sun { width: 160px; justify-self: center; }
   .sym .row { gap: 12px; padding: 12px; }
+}
+/* In Windows High Contrast mode backgrounds are replaced, so mark the selected option with the system highlight */
+@media (forced-colors: active) {
+  .seg input:checked + span,
+  .tabs input:checked + span,
+  .lang button[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
