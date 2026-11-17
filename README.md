@@ -1,10 +1,31 @@
 # Release Day Sick Note
 
-A joke website for calling in sick on the day GTA 6 comes out. You pick your symptoms, how much effort you want to put in and when you'll be back, and it writes the sick email for you. It's in German, with an English option.
+GTA 6 comes out and you have work. This site writes the sick email for you.
 
-Live: https://kynjii.github.io/release-day-sick-note/
+**Open it here:** https://kynjii.github.io/release-day-sick-note/
 
-## Running it locally
+## How it works
+
+1. Enter your name, your manager's name and the coworker who will "kindly" cover for you.
+2. Pick your symptoms, from Vice City Fever to Brain buffering. Every symptom makes the email less believable, and the number next to it shows by how much.
+3. Choose a tone, from Professional to Barely trying.
+4. Say when you'll be back, anywhere from Tomorrow to At 100% completion. The longer you're off, the more suspicious it looks.
+
+The email updates as you go, along with a believability score that tells you how likely HR is to buy it. When you're happy, press **Copy email** and paste it into your mail app. If you can't decide, **Random diagnosis** picks for you. You can also tick the box to add a P.S. that quietly tips off your coworkers.
+
+## Also on the page
+
+- A countdown to release day, based on the last announced date.
+- The latest GTA 6 news from t-online and GIGA, refreshed every hour. Use the tabs to see one site or both. The articles are in German and open in a new tab.
+- The page is in German by default. Use the EN button at the top to switch to English. The site remembers your choice next time.
+
+Your email is put together in your browser. Nothing you type is sent anywhere or saved.
+
+## Please don't actually send it
+
+This is a joke. It's not medical or HR advice, and it has nothing to do with Rockstar Games or any other game studio. If you do send it, good luck.
+
+## For developers
 
 You need Node 22.12 or newer.
 
@@ -14,33 +35,8 @@ npm run news
 npm run dev
 ```
 
-`npm run news` downloads the latest articles into `public/news.json`. `npm run dev` starts the site at http://localhost:5173.
+`npm run news` downloads the latest articles, and `npm run dev` starts the site at http://localhost:5173. `npm test` runs the tests, and `npm run build` builds the site into `dist/`.
 
-Other commands:
+The page text is in `src/i18n/`, and the symptoms, tones and points are in `src/content.js`. The news sites and their feeds are listed in `src/news/news.js`.
 
-- `npm test` runs the tests.
-- `npm run build` builds the site into `dist/`, and `npm run preview` serves that build.
-
-## How the code is laid out
-
-- `index.html` is the page. The German text and the form controls are filled in when the page is built (`src/render/page.js`), so the page is complete before any JavaScript runs.
-- `src/main.js` runs in the browser: it updates the email as you fill in the form, switches language, runs the countdown and shows the news.
-- `src/i18n/` has the page text in German and English.
-- `src/content.js` has the symptoms, tones, return dates and their points.
-- `src/email.js` builds the email and the believability score.
-- `src/news/` reads the news feeds and shows the articles.
-- `src/styles/` has the CSS. Colours, fonts and corner sizes are in `tokens.css`.
-
-## The news section
-
-The page lists recent GTA 6 articles from t-online and GIGA. Once an hour, a GitHub Action reads both sites' RSS feeds and saves the GTA articles to `news.json`, which the page loads. Each site keeps its 8 newest articles. If the feeds can't be reached, the site keeps the last list it had.
-
-The sites and their feeds are listed in `src/news/news.js`. To add a site, add it there.
-
-## Deploying
-
-Every push to `main` deploys the site, and the news is refreshed once an hour. GitHub stops the hourly run after 60 days without a commit. If that happens, start it again from the Actions tab.
-
----
-
-Just a joke. Not medical or HR advice, and not connected to any game studio.
+Every push to `main` deploys the site. A GitHub Action refreshes the news every hour, but GitHub pauses it after 60 days without a commit. If that happens, restart it from the Actions tab.
