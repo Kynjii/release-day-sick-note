@@ -38,5 +38,3 @@ npm run dev
 `npm run news` downloads the latest articles, and `npm run dev` starts the site at http://localhost:5173. `npm test` runs the tests, and `npm run build` builds the site into `dist/`.
 
 The page text is in `src/i18n/`, and the symptoms, tones and points are in `src/content.js`. The news sites and their feeds are listed in `src/news/news.js`.
-
-Every push to `main` deploys the site. A GitHub Action refreshes the news every hour, but GitHub pauses it after 60 days without a commit. If that happens, restart it from the Actions tab.
