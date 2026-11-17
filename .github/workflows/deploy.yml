@@ -27,19 +27,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npm test
       - id: pages
         uses: actions/configure-pages@v5
-      - name: Build site with the latest news
-        run: |
-          mkdir -p _site/lib
-          # Add the commit to the module URL so browsers don't use an old cached copy
-          sed 's#"\./lib/news\.js"#"./lib/news.js?v=${{ github.sha }}"#' index.html > _site/index.html
-          grep -q 'lib/news.js?v=${{ github.sha }}' _site/index.html
-          cp lib/news.js _site/lib/
-          node scripts/update-news.js _site/news.json "${{ steps.pages.outputs.base_url }}/news.json"
+      - run: npm run build
+      - name: Add the latest news
+        run: node scripts/update-news.js dist/news.json "${{ steps.pages.outputs.base_url }}/news.json"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -25,6 +25,9 @@ export const SOURCES = {
   },
 };
 export const MAX_ITEMS = 8; // per source
+export const ALL_SOURCES = "all";
+export const NEWS_FILTERS = [ALL_SOURCES, ...Object.keys(SOURCES)];
+export const siteOf = id => new URL(SOURCES[id].home).host.replace(/^www\./, "");
 const MAX_SUMMARY = 220;
 const TOPIC = /\bGTA\b|Grand Theft Auto/i;
 const SOURCE_BY_HOST = Object.fromEntries(Object.entries(SOURCES).map(([id, s]) => [new URL(s.home).host, id]));

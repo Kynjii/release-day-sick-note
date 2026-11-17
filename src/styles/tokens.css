@@ -1,0 +1,41 @@
+:root {
+  --bg: #FFE9DF;
+  --surface: #FFF8F4;
+  --ink: #2A1636;
+  --muted: #7A5A72;
+  --hot: #C8245A;
+  --sea: #0B8793;
+  --sun: #FF9F1C;
+  --line: #F0C6B8;
+  --sky-top: #FF7A59;
+  --sky-bottom: #FFC56E;
+  --on-hot: #FFFFFF;
+  --hero-fg: #2A1636;
+  --hero-inverse: #FFFFFF;
+  --hero-chip: rgba(255, 255, 255, 0.4);
+  --hero-chip-line: rgba(42, 22, 54, 0.28);
+  --hero-shadow: rgba(255, 255, 255, 0.45);
+  --radius: 4px;
+  --radius-sm: 2px;
+  --font-display: "Bungee", "Impact", "Arial Black", sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
+    --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
+    --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+    --hero-fg: #FFFFFF; --hero-inverse: #2A1636; --hero-chip: rgba(26, 16, 48, 0.28);
+    --hero-chip-line: rgba(255, 255, 255, 0.35); --hero-shadow: rgba(42, 22, 54, 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A1030; --surface: #251842; --ink: #FDEFF4; --muted: #B9A3C9;
+  --hot: #FF5C8A; --sea: #3FD3D9; --sun: #FFB347; --line: #3E2C61;
+  --sky-top: #3B1E6E; --sky-bottom: #C2386E; --on-hot: #1A1030;
+  --hero-fg: #FFFFFF; --hero-inverse: #2A1636; --hero-chip: rgba(26, 16, 48, 0.28);
+  --hero-chip-line: rgba(255, 255, 255, 0.35); --hero-shadow: rgba(42, 22, 54, 0.35);
+  color-scheme: dark;
+}

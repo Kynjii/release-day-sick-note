@@ -1,7 +1,7 @@
 // Builds news.json from the RSS feeds and keeps articles that are already on the live site.
 // Usage: node scripts/update-news.js <output file> [URL of the live news.json]
 import { writeFile } from "node:fs/promises";
-import { SOURCES, parseFeed, mergeNews } from "../lib/news.js";
+import { SOURCES, parseFeed, mergeNews } from "../src/news/news.js";
 
 const [out = "news.json", previousUrl] = process.argv.slice(2);
 const TIMEOUT_MS = 20_000;

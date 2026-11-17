@@ -1,2 +1,4 @@
+node_modules/
+dist/
+public/news.json
 news.json
-_site/
