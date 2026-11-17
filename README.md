@@ -19,7 +19,7 @@ The email updates as you go, along with a believability score that tells you how
 - The latest GTA 6 news from t-online and GIGA, refreshed every hour. Use the tabs to see one site or both. The articles are in German and open in a new tab.
 - The page is in German by default. Use the EN button at the top to switch to English. The site remembers your choice next time.
 
-Your email is put together in your browser. Nothing you type is sent anywhere or saved.
+Your email is put together in your browser. Nothing you type is sent anywhere or saved. The site counts visits with [GoatCounter](https://www.goatcounter.com/), which uses no cookies and collects no personal data.
 
 ## Please don't actually send it
 
