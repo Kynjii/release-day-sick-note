@@ -33,7 +33,7 @@ jobs:
       - name: Build site with the latest news
         run: |
           mkdir -p _site/lib
-          # Tie the module URL to this commit so a cached old lib/news.js is never paired with a new page
+          # Add the commit to the module URL so browsers don't use an old cached copy
           sed 's#"\./lib/news\.js"#"./lib/news.js?v=${{ github.sha }}"#' index.html > _site/index.html
           grep -q 'lib/news.js?v=${{ github.sha }}' _site/index.html
           cp lib/news.js _site/lib/

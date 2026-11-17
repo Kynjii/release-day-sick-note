@@ -1,5 +1,5 @@
-// Builds news.json from every source's RSS feeds, keeping articles already published on the live site.
-// Usage: node scripts/update-news.js <output path> [previous news.json URL]
+// Builds news.json from the RSS feeds and keeps articles that are already on the live site.
+// Usage: node scripts/update-news.js <output file> [URL of the live news.json]
 import { writeFile } from "node:fs/promises";
 import { SOURCES, parseFeed, mergeNews } from "../lib/news.js";
 
@@ -17,7 +17,7 @@ const results = await Promise.allSettled(FEEDS.map(async url => parseFeed(await 
 results.filter(r => r.status === "rejected").forEach(r => console.warn("Feed failed:", r.reason.message));
 const fresh = results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
 if (results.every(r => r.status === "rejected")) {
-  // Fail the run so the live site keeps its current list instead of losing it.
+  // Stop here so the live site keeps its current list.
   console.error("Every feed failed; not publishing.");
   process.exit(1);
 }

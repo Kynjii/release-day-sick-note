@@ -12,7 +12,6 @@
 <style>
 body { margin: 0; }
 [hidden] { display: none !important; }
-/* Layout: sunset hero band with a striped sun, then a two-column workbench: symptom chart on the left, live email + believability meter on the right. */
 :root {
   --bg: #FFE9DF;
   --surface: #FFF8F4;
@@ -223,7 +222,6 @@ input[type="text"] {
 }
 input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset: 1px; border-color: var(--sea); }
 
-/* Symptom chart: [checkbox] [code over name] [points pill], same three columns at every width */
 .chart { display: grid; gap: 8px; }
 .sym { position: relative; display: block; cursor: pointer; }
 .sym input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
@@ -279,7 +277,6 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .sym input:checked + .row .cost { color: var(--hot); background: color-mix(in srgb, var(--hot) 16%, transparent); }
 .sym input:focus-visible + .row { outline: 3px solid var(--sea); outline-offset: 2px; }
 
-/* Segmented choices */
 .seg { display: flex; flex-wrap: wrap; gap: 8px; }
 .seg label { position: relative; cursor: pointer; }
 .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
@@ -300,7 +297,6 @@ input[type="text"]:focus-visible { outline: 3px solid var(--sea); outline-offset
 .toggle { display: flex; gap: 10px; align-items: center; font-size: 15px; cursor: pointer; }
 .toggle input { width: 18px; height: 18px; accent-color: var(--hot); flex: none; }
 
-/* Output */
 .out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; }
 .meter {
   background: var(--surface);
@@ -524,7 +520,7 @@ footer .wrap { padding-block: 0 40px; color: var(--muted); font-size: 13px; }
 <script type="module">
 import { cleanNews, sourceOf, SOURCES } from "./lib/news.js";
 
-// Each entry keeps its language-independent data (id, code, cost) once, with text per language.
+// Ids, codes and costs are shared; only the text differs per language.
 
 const LANGS = {
   en: { label: "EN", locale: "en-GB", and: "and" },
@@ -727,10 +723,10 @@ const VERDICTS = [
 ];
 
 const PS_COST = 10;
-const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date, local midnight
+const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date
 const LANG_KEY = "sick-note-lang";
 const SOURCE_KEY = "sick-note-source";
-const DEFAULT_LANG = "de"; // shown until the visitor picks a language
+const DEFAULT_LANG = "de";
 
 const $ = id => document.getElementById(id);
 let lang = DEFAULT_LANG;
@@ -751,7 +747,7 @@ function el(tag, props = {}, ...children) {
   return node;
 }
 
-// null while loading; afterwards the cleaned list from news.json (empty if it failed to load)
+// null until news.json has loaded, empty if it couldn't be loaded
 let news = null;
 const ALL = "all";
 const NEWS_FILTERS = [ALL, ...Object.keys(SOURCES)];
@@ -821,7 +817,7 @@ buildSeg($("tone"), "tone", TONES);
 buildSeg($("ret"), "ret", RETURNS);
 buildSeg($("news-source"), "src", NEWS_FILTERS.map(id => ({ id })));
 
-// Example starting state
+// Start with an example filled in
 FIELDS.forEach(f => { $("f-" + f.id).value = f.text[DEFAULT_LANG].example; });
 ["fever", "thumb", "light"].forEach(id => { $("s-" + id).checked = true; });
 
@@ -831,7 +827,7 @@ function setLang(next) {
   document.documentElement.lang = lang;
   document.title = t("docTitle");
 
-  // Swap example values only where the visitor hasn't typed their own
+  // Only swap the example text, never what the visitor typed
   FIELDS.forEach(f => {
     const input = $("f-" + f.id);
     if (input.value === f.text[prev].example) input.value = f.text[lang].example;
