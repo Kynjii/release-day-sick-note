@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Calling in sick on GTA 6 release day? Pick your symptoms, choose a tone, and copy an email HR will absolutely believe.">
+<meta name="description" content="Krank am Release-Tag von GTA 6? Symptome wählen, Tonfall festlegen und eine E-Mail kopieren, die die Personalabteilung garantiert glaubt.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤒</text></svg>">
-<title>Release Day Sick Note</title>
+<title>Release-Tag-Krankmeldung</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -697,9 +697,10 @@ const VERDICTS = [
 const PS_COST = 10;
 const RELEASE = new Date(2026, 10, 19, 0, 0, 0); // last announced release date, local midnight
 const LANG_KEY = "sick-note-lang";
+const DEFAULT_LANG = "de"; // shown until the visitor picks a language
 
 const $ = id => document.getElementById(id);
-let lang = "en";
+let lang = DEFAULT_LANG;
 const t = key => UI[lang][key];
 const tx = item => item.text[lang];
 
@@ -780,12 +781,12 @@ buildSeg($("tone"), "tone", TONES);
 buildSeg($("ret"), "ret", RETURNS);
 
 // Example starting state
-FIELDS.forEach(f => { $("f-" + f.id).value = f.text.en.example; });
+FIELDS.forEach(f => { $("f-" + f.id).value = f.text[DEFAULT_LANG].example; });
 ["fever", "thumb", "light"].forEach(id => { $("s-" + id).checked = true; });
 
 function setLang(next) {
   const prev = lang;
-  lang = Object.hasOwn(LANGS, next) ? next : "en";
+  lang = Object.hasOwn(LANGS, next) ? next : DEFAULT_LANG;
   document.documentElement.lang = lang;
   document.title = t("docTitle");
 
@@ -895,8 +896,7 @@ function tick() {
 
 let saved = null;
 try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
-const browserLang = (navigator.language || "en").slice(0, 2).toLowerCase();
-setLang(Object.hasOwn(LANGS, saved) ? saved : browserLang);
+setLang(saved);
 loadNews();
 setInterval(tick, 1000);
 </script>
