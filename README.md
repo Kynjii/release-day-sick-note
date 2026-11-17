@@ -1,18 +1,16 @@
 # Release Day Sick Note
 
-A joke page for calling in sick on GTA 6 release day. Pick your symptoms, choose a tone and a return date, and copy an email that HR will absolutely believe. German by default, with an English switch.
+A joke website for calling in sick on the day GTA 6 comes out. You pick your symptoms, how much effort you want to put in and when you'll be back, and it writes the sick email for you. It's in German, with an English option.
 
-**Live site:** https://kynjii.github.io/release-day-sick-note/
+Live: https://kynjii.github.io/release-day-sick-note/
 
-## How it works
+## The news section
 
-- `index.html` is the whole page. No build step, no dependencies.
-- The "Latest on GTA 6" section reads `news.json`, built from the RSS feeds of t-online (Rockstar Games topic, digital, digital news, gaming) and GIGA (GTA 6 topic, games). Only articles about GTA are kept, newest first, up to 8 per source. Tabs above the list show all sources together (default) or one at a time; the choice is remembered.
-- Sources, their feeds and the hosts their links may point to are all defined in `SOURCES` in `lib/news.js`. To add a source, add an entry there.
-- `.github/workflows/deploy.yml` deploys the site to GitHub Pages on every push to `main` and once an hour. Each run fetches the feeds, merges them with the `news.json` already live (so articles stay listed after they drop off the feeds), and publishes the result. If every feed fails, the run stops and the live site keeps its current list.
-- `lib/news.js` holds the parsing and filtering rules. The page uses the same file to check `news.json` before showing it.
+The page also lists recent GTA 6 articles from t-online and GIGA. Once an hour, a GitHub Action reads both sites' RSS feeds and saves the GTA articles to `news.json`, which the page loads. Each site keeps its 8 newest articles. If the feeds can't be reached, the site keeps the last list it had.
 
-## Run locally
+The sites and their feeds are listed in `lib/news.js`. To add a site, add it there.
+
+## Running it locally
 
 ```bash
 npm test
@@ -20,8 +18,12 @@ npm run news
 python -m http.server 8000
 ```
 
-`npm run news` writes `news.json` next to `index.html` (it's git-ignored). Then open http://localhost:8000.
+`npm run news` downloads the latest articles into `news.json`. Then open http://localhost:8000.
 
-GitHub pauses scheduled workflows in public repos after 60 days without commits. Run the workflow by hand from the Actions tab, or push any commit, to start it again.
+## Deploying
 
-Not medical advice, not HR advice, and not affiliated with any game studio.
+Every push to `main` deploys the site, and the news is refreshed once an hour. GitHub stops the hourly run after 60 days without a commit. If that happens, start it again from the Actions tab.
+
+---
+
+Just a joke. Not medical or HR advice, and not connected to any game studio.
